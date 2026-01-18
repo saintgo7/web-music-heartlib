@@ -1,30 +1,134 @@
 # =============================================================================
-# Website Deployment to Cloudflare Pages
+# Website & API Deployment to Cloudflare
 #
-# This workflow deploys the website to Cloudflare Pages.
+# This workflow deploys the website to Cloudflare Pages and the API to
+# Cloudflare Workers with comprehensive health checks and auto-rollback.
+#
 # Triggered on:
-#   - Push to main branch (web/** changes)
+#   - Push to main branch (web/** or functions/** changes)
 #   - Manual dispatch
 #
 # Required Secrets:
-#   - CLOUDFLARE_API_TOKEN: Cloudflare API token with Pages permissions
+#   - CLOUDFLARE_API_TOKEN: Cloudflare API token with Pages/Workers permissions
 #   - CLOUDFLARE_ACCOUNT_ID: Cloudflare account ID
+#
+# Optional Secrets:
+#   - SLACK_WEBHOOK_URL: Slack webhook for notifications
+#   - ADMIN_API_KEY: Admin API key for Workers secrets
+#
+# Version: 2.0.0
+# Updated: 2025-01-19
 # =============================================================================
 
-name: Deploy Website
+name: Deploy Website & API
 
 on:
   push:
     branches: [main]
     paths:
       - 'web/**'
+      - 'functions/**'
+      - 'wrangler.toml'
       - '.github/workflows/deploy-website.yml'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+      skip_health_check:
+        description: 'Skip health checks'
+        required: false
+        default: false
+        type: boolean
+      force_deploy:
+        description: 'Force deploy (skip cache)'
+        required: false
+        default: false
+        type: boolean
+
+# Concurrency control - cancel in-progress runs
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PAGES_PROJECT_NAME: 'abada-music'
+  DOMAIN_NAME: 'music.abada.kr'
+  DEPLOYMENT_ID: ${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
-  deploy:
-    name: Build & Deploy
+  # ==========================================================================
+  # Pre-deployment Checks
+  # ==========================================================================
+  pre-deploy:
+    name: Pre-deployment Checks
     runs-on: ubuntu-latest
+    outputs:
+      should_deploy_web: ${{ steps.changes.outputs.web }}
+      should_deploy_api: ${{ steps.changes.outputs.api }}
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for changes
+        id: changes
+        run: |
+          # Check which components changed
+          if git diff --name-only HEAD~1 HEAD | grep -q "^web/"; then
+            echo "web=true" >> $GITHUB_OUTPUT
+          else
+            echo "web=false" >> $GITHUB_OUTPUT
+          fi
+
+          if git diff --name-only HEAD~1 HEAD | grep -qE "^(functions/|wrangler.toml)"; then
+            echo "api=true" >> $GITHUB_OUTPUT
+          else
+            echo "api=false" >> $GITHUB_OUTPUT
+          fi
+
+          # For manual dispatch, deploy everything
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "web=true" >> $GITHUB_OUTPUT
+            echo "api=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep -o '"version": "[^"]*"' web/package.json | cut -d'"' -f4 || echo "0.0.0")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is not set"
+            exit 1
+          fi
+          echo "All required secrets are configured"
+
+  # ==========================================================================
+  # Build Website
+  # ==========================================================================
+  build-website:
+    name: Build Website
+    runs-on: ubuntu-latest
+    needs: pre-deploy
+    if: needs.pre-deploy.outputs.should_deploy_web == 'true'
 
     steps:
       - name: Checkout repository
@@ -33,7 +137,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
@@ -41,36 +145,83 @@ jobs:
         working-directory: web
         run: |
           npm ci || npm install
+          echo "Dependencies installed successfully"
 
       - name: Build website
         working-directory: web
         env:
           NODE_ENV: production
+          VITE_APP_VERSION: ${{ needs.pre-deploy.outputs.version }}
+          VITE_API_URL: https://${{ env.DOMAIN_NAME }}/api
         run: |
           npm run build
+          echo "Build completed"
+
+          # Build stats
+          BUILD_SIZE=$(du -sh dist | cut -f1)
+          FILE_COUNT=$(find dist -type f | wc -l)
+          echo "Build size: $BUILD_SIZE"
+          echo "File count: $FILE_COUNT"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-build
+          path: web/dist
+          retention-days: 7
+
+  # ==========================================================================
+  # Deploy to Cloudflare Pages
+  # ==========================================================================
+  deploy-pages:
+    name: Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, build-website]
+    if: needs.pre-deploy.outputs.should_deploy_web == 'true'
+    outputs:
+      pages_url: ${{ steps.deploy.outputs.url }}
+      deployment_id: ${{ steps.deploy.outputs.id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: website-build
+          path: web/dist
 
       - name: Deploy to Cloudflare Pages
+        id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy web/build --project-name=abada-music --commit-dirty=true
+          command: pages deploy web/dist --project-name=${{ env.PAGES_PROJECT_NAME }} --commit-dirty=true --branch=main
 
-      - name: Deployment Summary
+      - name: Extract deployment info
         run: |
-          echo "## Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "## Pages Deployment" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Website deployed to Cloudflare Pages" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project**: abada-music" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project**: ${{ env.PAGES_PROJECT_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: main" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Production URL**: https://${{ env.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
 
-  # Deploy Cloudflare Workers (API functions)
+  # ==========================================================================
+  # Deploy Cloudflare Workers API
+  # ==========================================================================
   deploy-workers:
-    name: Deploy Workers
+    name: Deploy Cloudflare Workers
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: [pre-deploy, deploy-pages]
+    if: |
+      always() &&
+      needs.pre-deploy.outputs.should_deploy_api == 'true' &&
+      (needs.deploy-pages.result == 'success' || needs.deploy-pages.result == 'skipped')
+    outputs:
+      workers_url: ${{ steps.deploy.outputs.deployment-url }}
 
     steps:
       - name: Checkout repository
@@ -79,18 +230,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Check if functions exist
         id: check_functions
         run: |
           if [ -d "functions" ] && [ -f "wrangler.toml" ]; then
             echo "has_functions=true" >> $GITHUB_OUTPUT
+            echo "Functions directory found"
           else
             echo "has_functions=false" >> $GITHUB_OUTPUT
+            echo "No functions directory found"
           fi
 
       - name: Deploy Cloudflare Workers
+        id: deploy
         if: steps.check_functions.outputs.has_functions == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
@@ -98,9 +252,220 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
 
-      - name: Skip Workers deployment
-        if: steps.check_functions.outputs.has_functions == 'false'
+      - name: Workers Deployment Summary
+        if: steps.check_functions.outputs.has_functions == 'true'
         run: |
-          echo "No Cloudflare Workers found, skipping deployment"
-          echo "## Workers Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "No wrangler.toml or functions directory found" >> $GITHUB_STEP_SUMMARY
+          echo "## Workers Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Worker**: abada-music-api" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Deployed" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================================================
+  # Post-deployment Health Checks
+  # ==========================================================================
+  health-checks:
+    name: Health Checks
+    runs-on: ubuntu-latest
+    needs: [deploy-pages, deploy-workers]
+    if: |
+      always() &&
+      (needs.deploy-pages.result == 'success' || needs.deploy-workers.result == 'success') &&
+      github.event.inputs.skip_health_check != 'true'
+    outputs:
+      health_status: ${{ steps.health.outputs.status }}
+
+    steps:
+      - name: Wait for deployment propagation
+        run: |
+          echo "Waiting 30 seconds for deployment propagation..."
+          sleep 30
+
+      - name: Check website accessibility
+        id: website_check
+        run: |
+          echo "Checking website accessibility..."
+          PAGES_URL="https://${{ env.PAGES_PROJECT_NAME }}.pages.dev"
+          PROD_URL="https://${{ env.DOMAIN_NAME }}"
+
+          # Check Pages URL
+          PAGES_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PAGES_URL" --connect-timeout 10 --max-time 30 || echo "000")
+          echo "Pages URL ($PAGES_URL): HTTP $PAGES_STATUS"
+
+          # Check Production URL
+          PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL" --connect-timeout 10 --max-time 30 || echo "000")
+          echo "Production URL ($PROD_URL): HTTP $PROD_STATUS"
+
+          if [ "$PAGES_STATUS" = "200" ] || [ "$PROD_STATUS" = "200" ]; then
+            echo "website_ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "website_ok=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check API health
+        id: api_check
+        run: |
+          echo "Checking API health..."
+          API_URL="https://${{ env.DOMAIN_NAME }}/api/health"
+
+          API_RESPONSE=$(curl -s "$API_URL" --connect-timeout 10 --max-time 30 || echo "{}")
+          echo "API Response: $API_RESPONSE"
+
+          if echo "$API_RESPONSE" | grep -q '"status":"ok"'; then
+            echo "api_ok=true" >> $GITHUB_OUTPUT
+            echo "API health check passed"
+          else
+            echo "api_ok=false" >> $GITHUB_OUTPUT
+            echo "API health check failed"
+          fi
+
+      - name: Check critical pages
+        id: pages_check
+        run: |
+          echo "Checking critical pages..."
+          BASE_URL="https://${{ env.DOMAIN_NAME }}"
+          PAGES=("/" "/download" "/gallery" "/tutorial" "/faq" "/about")
+          FAILED=0
+
+          for page in "${PAGES[@]}"; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${BASE_URL}${page}" --connect-timeout 10 --max-time 30 || echo "000")
+            echo "Page $page: HTTP $STATUS"
+            if [ "$STATUS" != "200" ]; then
+              FAILED=$((FAILED + 1))
+            fi
+          done
+
+          if [ $FAILED -eq 0 ]; then
+            echo "pages_ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "pages_ok=false" >> $GITHUB_OUTPUT
+            echo "$FAILED pages failed health check"
+          fi
+
+      - name: Determine health status
+        id: health
+        run: |
+          WEBSITE_OK="${{ steps.website_check.outputs.website_ok }}"
+          API_OK="${{ steps.api_check.outputs.api_ok }}"
+          PAGES_OK="${{ steps.pages_check.outputs.pages_ok }}"
+
+          echo "Website: $WEBSITE_OK"
+          echo "API: $API_OK"
+          echo "Pages: $PAGES_OK"
+
+          if [ "$WEBSITE_OK" = "true" ] && [ "$API_OK" = "true" ] && [ "$PAGES_OK" = "true" ]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+            echo "All health checks passed!"
+          elif [ "$WEBSITE_OK" = "true" ]; then
+            echo "status=partial" >> $GITHUB_OUTPUT
+            echo "Partial health - some checks failed"
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+            echo "Health checks failed!"
+          fi
+
+      - name: Health Check Summary
+        run: |
+          echo "## Health Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Website | ${{ steps.website_check.outputs.website_ok == 'true' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API | ${{ steps.api_check.outputs.api_ok == 'true' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pages | ${{ steps.pages_check.outputs.pages_ok == 'true' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Overall Status**: ${{ steps.health.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================================================
+  # Auto-rollback on Failure
+  # ==========================================================================
+  rollback:
+    name: Auto-rollback
+    runs-on: ubuntu-latest
+    needs: [health-checks]
+    if: needs.health-checks.outputs.health_status == 'unhealthy'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Notify rollback start
+        run: |
+          echo "::warning::Health checks failed! Initiating rollback..."
+
+      - name: Rollback Workers
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: rollback
+
+      - name: Rollback notification
+        run: |
+          echo "## ROLLBACK EXECUTED" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Health checks failed after deployment. Workers have been rolled back." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action Required**: Please check the Pages deployment manually in Cloudflare Dashboard." >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Slack notification (if configured)
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"ABADA Music Studio deployment failed and was rolled back. Please check the deployment logs."}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || true
+
+  # ==========================================================================
+  # Final Deployment Summary
+  # ==========================================================================
+  deployment-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, deploy-pages, deploy-workers, health-checks]
+    if: always()
+
+    steps:
+      - name: Generate deployment summary
+        run: |
+          echo "# Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Information" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment ID | ${{ env.DEPLOYMENT_ID }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.pre-deploy.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "## Component Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Pages | ${{ needs.deploy-pages.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Workers | ${{ needs.deploy-workers.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Health Checks | ${{ needs.health-checks.outputs.health_status || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "## URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Production**: https://${{ env.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pages**: https://${{ env.PAGES_PROJECT_NAME }}.pages.dev" >> $GITHUB_STEP_SUMMARY
+          echo "- **API**: https://${{ env.DOMAIN_NAME }}/api" >> $GITHUB_STEP_SUMMARY
+
+      - name: Set final status
+        run: |
+          PAGES_STATUS="${{ needs.deploy-pages.result }}"
+          WORKERS_STATUS="${{ needs.deploy-workers.result }}"
+          HEALTH_STATUS="${{ needs.health-checks.outputs.health_status }}"
+
+          if [ "$PAGES_STATUS" = "success" ] || [ "$PAGES_STATUS" = "skipped" ]; then
+            if [ "$WORKERS_STATUS" = "success" ] || [ "$WORKERS_STATUS" = "skipped" ]; then
+              if [ "$HEALTH_STATUS" = "healthy" ] || [ "$HEALTH_STATUS" = "partial" ]; then
+                echo "Deployment completed successfully!"
+                exit 0
+              fi
+            fi
+          fi
+
+          echo "Deployment completed with issues. Please check the summary."
+          exit 0  # Don't fail the workflow, issues are logged

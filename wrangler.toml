@@ -1,5 +1,5 @@
 # =============================================================================
-# ABADA Music Studio - Cloudflare Workers Configuration
+# ABADA Music Studio - Cloudflare Workers Configuration (Final Version)
 #
 # This configuration file defines the Cloudflare Workers settings
 # for the ABADA Music Studio API.
@@ -8,6 +8,9 @@
 #
 # Deploy command: wrangler deploy
 # Dev command: wrangler dev
+#
+# Version: 1.0.0
+# Updated: 2025-01-19
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -19,16 +22,16 @@ main = "functions/api/index.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Account ID (can also be set via CLOUDFLARE_ACCOUNT_ID environment variable)
-# Uncomment and set your account ID, or use environment variable
-# account_id = "your-account-id"
+# Account ID (set via CLOUDFLARE_ACCOUNT_ID environment variable)
+# Uncomment and set your account ID if not using environment variable
+# account_id = "YOUR_ACCOUNT_ID_HERE"
 
 # -----------------------------------------------------------------------------
-# Workers Routes (Optional)
+# Workers Routes (Production)
 # Configure custom domain routing for the API
 # -----------------------------------------------------------------------------
 
-# Uncomment to enable custom domain routing:
+# Production routes - uncomment after DNS setup
 # routes = [
 #   { pattern = "music.abada.kr/api/*", zone_name = "abada.kr" }
 # ]
@@ -41,24 +44,35 @@ compatibility_flags = ["nodejs_compat"]
 # KV Namespaces
 # Storage for download statistics, gallery data, and analytics
 #
-# To create namespaces:
-#   wrangler kv:namespace create "STATS"
-#   wrangler kv:namespace create "STATS" --preview
-#   wrangler kv:namespace create "GALLERY"
-#   wrangler kv:namespace create "GALLERY" --preview
-#
-# Then replace the PLACEHOLDER values with actual IDs
+# SETUP INSTRUCTIONS:
+# 1. Run CLOUDFLARE_SETUP_AUTOMATION.sh to create namespaces automatically
+# 2. Or manually create using:
+#    wrangler kv:namespace create "STATS"
+#    wrangler kv:namespace create "STATS" --preview
+#    wrangler kv:namespace create "GALLERY"
+#    wrangler kv:namespace create "GALLERY" --preview
+#    wrangler kv:namespace create "ANALYTICS"
+#    wrangler kv:namespace create "ANALYTICS" --preview
+# 3. Replace PLACEHOLDER values with actual IDs
 # -----------------------------------------------------------------------------
 
+# Download Statistics Storage
 [[kv_namespaces]]
 binding = "STATS"
 id = "PLACEHOLDER_STATS_KV_ID"
 preview_id = "PLACEHOLDER_STATS_KV_PREVIEW_ID"
 
+# Gallery Samples Storage
 [[kv_namespaces]]
 binding = "GALLERY"
 id = "PLACEHOLDER_GALLERY_KV_ID"
 preview_id = "PLACEHOLDER_GALLERY_KV_PREVIEW_ID"
+
+# Analytics Events Storage
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "PLACEHOLDER_ANALYTICS_KV_ID"
+preview_id = "PLACEHOLDER_ANALYTICS_KV_PREVIEW_ID"
 
 # -----------------------------------------------------------------------------
 # Environment Variables (Public)
@@ -75,10 +89,18 @@ GITHUB_REPO = "saintgo7/web-music-heartlib"
 API_VERSION = "v1"
 LOG_LEVEL = "info"
 CORS_ALLOW_ALL = "true"
+# Rate limiting
+RATE_LIMIT_REQUESTS = "100"
+RATE_LIMIT_WINDOW = "60"
+# Cache settings
+CACHE_TTL_STATS = "300"
+CACHE_TTL_GALLERY = "3600"
+# Analytics
+ANALYTICS_ENABLED = "true"
 
 # -----------------------------------------------------------------------------
 # Development Environment
-# Local development settings
+# Local development settings (wrangler dev)
 # -----------------------------------------------------------------------------
 
 [env.development]
@@ -88,6 +110,8 @@ name = "abada-music-api-dev"
 ENVIRONMENT = "development"
 LOG_LEVEL = "debug"
 CORS_ALLOW_ALL = "true"
+WEBSITE_URL = "http://localhost:5173"
+ANALYTICS_ENABLED = "false"
 
 # Development KV namespaces (use preview IDs)
 # Uncomment and configure after creating namespaces
@@ -99,9 +123,13 @@ CORS_ALLOW_ALL = "true"
 # binding = "GALLERY"
 # id = "YOUR_GALLERY_KV_PREVIEW_ID"
 
+# [[env.development.kv_namespaces]]
+# binding = "ANALYTICS"
+# id = "YOUR_ANALYTICS_KV_PREVIEW_ID"
+
 # -----------------------------------------------------------------------------
 # Staging Environment
-# Pre-production testing
+# Pre-production testing (wrangler deploy --env staging)
 # -----------------------------------------------------------------------------
 
 [env.staging]
@@ -111,6 +139,8 @@ name = "abada-music-api-staging"
 ENVIRONMENT = "staging"
 WEBSITE_URL = "https://staging.music.abada.kr"
 LOG_LEVEL = "debug"
+CORS_ALLOW_ALL = "true"
+ANALYTICS_ENABLED = "true"
 
 # Staging routes (optional)
 # routes = [
@@ -127,9 +157,13 @@ LOG_LEVEL = "debug"
 # binding = "GALLERY"
 # id = "YOUR_STAGING_GALLERY_KV_ID"
 
+# [[env.staging.kv_namespaces]]
+# binding = "ANALYTICS"
+# id = "YOUR_STAGING_ANALYTICS_KV_ID"
+
 # -----------------------------------------------------------------------------
 # Production Environment
-# Live production settings
+# Live production settings (wrangler deploy --env production)
 # -----------------------------------------------------------------------------
 
 [env.production]
@@ -139,6 +173,7 @@ name = "abada-music-api"
 ENVIRONMENT = "production"
 LOG_LEVEL = "warn"
 CORS_ALLOW_ALL = "false"
+ANALYTICS_ENABLED = "true"
 
 # Production routes
 # routes = [
@@ -156,6 +191,11 @@ CORS_ALLOW_ALL = "false"
 # id = "YOUR_PRODUCTION_GALLERY_KV_ID"
 # preview_id = "YOUR_PRODUCTION_GALLERY_KV_PREVIEW_ID"
 
+# [[env.production.kv_namespaces]]
+# binding = "ANALYTICS"
+# id = "YOUR_PRODUCTION_ANALYTICS_KV_ID"
+# preview_id = "YOUR_PRODUCTION_ANALYTICS_KV_PREVIEW_ID"
+
 # -----------------------------------------------------------------------------
 # Build Configuration
 # Custom build settings (if needed)
@@ -168,14 +208,20 @@ command = ""
 # Watch directories for development mode
 # watch_dir = "functions"
 
+# Upload source maps for debugging
+# upload_source_maps = true
+
 # -----------------------------------------------------------------------------
 # Triggers
 # Schedule and event triggers
 # -----------------------------------------------------------------------------
 
-# Cron triggers for scheduled tasks (e.g., daily cleanup)
+# Cron triggers for scheduled tasks
 # [triggers]
-# crons = ["0 0 * * *"]  # Daily at midnight UTC
+# crons = [
+#   "0 0 * * *",     # Daily at midnight UTC - cleanup old data
+#   "0 */6 * * *"    # Every 6 hours - aggregate analytics
+# ]
 
 # -----------------------------------------------------------------------------
 # Observability
@@ -185,7 +231,7 @@ command = ""
 [observability]
 enabled = true
 
-# Log push (optional - requires separate setup)
+# Log push configuration (optional - requires Logpush subscription)
 # [observability.logs]
 # enabled = true
 # invocation_logs = true
@@ -195,15 +241,56 @@ enabled = true
 # Resource limits for the Worker
 # -----------------------------------------------------------------------------
 
+# CPU time limit (milliseconds)
 # limits = { cpu_ms = 50 }
 
 # -----------------------------------------------------------------------------
 # Placement
-# Geo-location hints (optional)
+# Geo-location hints for Worker placement
 # -----------------------------------------------------------------------------
 
+# Smart placement - automatically place Worker near users
 # [placement]
 # mode = "smart"
+
+# -----------------------------------------------------------------------------
+# Analytics Engine (Beta)
+# Real-time analytics storage
+# -----------------------------------------------------------------------------
+
+# Uncomment to enable Analytics Engine
+# [[analytics_engine_datasets]]
+# binding = "MUSIC_ANALYTICS"
+
+# -----------------------------------------------------------------------------
+# Durable Objects (Optional)
+# For stateful applications
+# -----------------------------------------------------------------------------
+
+# [[durable_objects.bindings]]
+# name = "RATE_LIMITER"
+# class_name = "RateLimiter"
+
+# [[migrations]]
+# tag = "v1"
+# new_classes = ["RateLimiter"]
+
+# -----------------------------------------------------------------------------
+# AI Binding (Optional)
+# Workers AI integration
+# -----------------------------------------------------------------------------
+
+# [ai]
+# binding = "AI"
+
+# -----------------------------------------------------------------------------
+# R2 Storage (Optional)
+# Object storage for large files
+# -----------------------------------------------------------------------------
+
+# [[r2_buckets]]
+# binding = "MUSIC_FILES"
+# bucket_name = "abada-music-files"
 
 # -----------------------------------------------------------------------------
 # Secrets (Reference Only)
@@ -222,35 +309,59 @@ enabled = true
 # Usage Notes
 # -----------------------------------------------------------------------------
 #
-# 1. First-time Setup:
-#    a. Create KV namespaces:
+# 1. FIRST-TIME SETUP:
+#    a. Run the automated setup script:
+#       ./scripts/CLOUDFLARE_SETUP_AUTOMATION.sh
+#
+#    b. Or manually create KV namespaces:
 #       wrangler kv:namespace create "STATS"
 #       wrangler kv:namespace create "STATS" --preview
 #       wrangler kv:namespace create "GALLERY"
 #       wrangler kv:namespace create "GALLERY" --preview
+#       wrangler kv:namespace create "ANALYTICS"
+#       wrangler kv:namespace create "ANALYTICS" --preview
 #
-#    b. Update this file with the namespace IDs
+#    c. Update this file with the namespace IDs
 #
-#    c. Set secrets:
+#    d. Set secrets:
 #       wrangler secret put ADMIN_API_KEY
 #
-#    d. Deploy:
+#    e. Deploy:
 #       wrangler deploy
 #
-# 2. Development:
+# 2. DEVELOPMENT:
 #    wrangler dev
+#    # Opens local development server at http://localhost:8787
 #
-# 3. Deploy to specific environment:
-#    wrangler deploy --env staging
-#    wrangler deploy --env production
+# 3. DEPLOY TO SPECIFIC ENVIRONMENT:
+#    wrangler deploy                    # Default (production)
+#    wrangler deploy --env staging      # Staging
+#    wrangler deploy --env production   # Production (explicit)
 #
-# 4. View logs:
+# 4. VIEW LOGS:
 #    wrangler tail
 #    wrangler tail --env production
+#    wrangler tail --format=json
 #
-# 5. Manage KV data:
+# 5. MANAGE KV DATA:
+#    # List all keys
 #    wrangler kv:key list --namespace-id=YOUR_KV_ID
+#
+#    # Get a key
 #    wrangler kv:key get --namespace-id=YOUR_KV_ID "key"
+#
+#    # Set a key
 #    wrangler kv:key put --namespace-id=YOUR_KV_ID "key" "value"
+#
+#    # Delete a key
+#    wrangler kv:key delete --namespace-id=YOUR_KV_ID "key"
+#
+# 6. ROLLBACK:
+#    wrangler rollback
+#    # Or use Cloudflare Dashboard to select specific version
+#
+# 7. VIEW DEPLOYMENTS:
+#    wrangler deployments list
+#    wrangler deployments view <deployment-id>
 #
 # =============================================================================

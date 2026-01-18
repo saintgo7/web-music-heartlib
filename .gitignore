@@ -8,3 +8,24 @@ checkpoint/
 **.egg-info/
 build/
 .idea/
+
+# Cloudflare
+.env.cloudflare
+.wrangler/
+
+# Logs
+logs/
+
+# Node modules
+node_modules/
+
+# Virtual environments
+venv/
+.venv/
+
+# Installer dev files
+installer/
+
+# Temporary files
+*.tmp
+*.log

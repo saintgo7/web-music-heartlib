@@ -1,5 +1,5 @@
 # =============================================================================
-# ABADA Music Studio - Cloudflare Workers Configuration (Final Version)
+# ABADA Music Studio - Cloudflare Workers Configuration (Production Ready)
 #
 # This configuration file defines the Cloudflare Workers settings
 # for the ABADA Music Studio API.
@@ -10,7 +10,12 @@
 # Dev command: wrangler dev
 #
 # Version: 1.0.0
-# Updated: 2025-01-19
+# Updated: 2026-01-19
+#
+# SLA Targets:
+#   - Uptime: 99.9%
+#   - Response Time (p95): < 1s
+#   - Error Rate: < 0.1%
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -174,6 +179,14 @@ ENVIRONMENT = "production"
 LOG_LEVEL = "warn"
 CORS_ALLOW_ALL = "false"
 ANALYTICS_ENABLED = "true"
+# Production-specific settings
+RATE_LIMIT_REQUESTS = "100"
+RATE_LIMIT_WINDOW = "60"
+CACHE_TTL_STATS = "300"
+CACHE_TTL_GALLERY = "3600"
+# Error handling
+ERROR_REPORTING = "true"
+DEBUG_MODE = "false"
 
 # Production routes
 # routes = [
@@ -230,6 +243,16 @@ command = ""
 
 [observability]
 enabled = true
+
+# Observability settings for production monitoring
+# Logs are automatically captured and can be viewed via:
+#   wrangler tail
+#   wrangler tail --format=json
+#
+# For production monitoring, enable the following in Cloudflare Dashboard:
+# - Workers Analytics
+# - Real-time logs
+# - Error tracking
 
 # Log push configuration (optional - requires Logpush subscription)
 # [observability.logs]

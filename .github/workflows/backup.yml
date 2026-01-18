@@ -1,0 +1,236 @@
+# =============================================================================
+# ABADA Music Studio - Automated Backup Workflow
+#
+# This workflow performs automated backups of KV Store data.
+#
+# Schedule:
+#   - Daily at 02:00 UTC (11:00 KST)
+#
+# Version: 1.0.0
+# Updated: 2026-01-19
+# =============================================================================
+
+name: Automated Backup
+
+on:
+  schedule:
+    # Daily at 02:00 UTC (11:00 KST)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      namespaces:
+        description: 'Namespaces to backup (comma-separated: stats,gallery,analytics or all)'
+        required: false
+        default: 'all'
+
+env:
+  BACKUP_RETENTION_DAYS: 90
+
+jobs:
+  backup:
+    name: KV Store Backup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Create backup directory
+        run: |
+          BACKUP_DATE=$(date +%Y-%m-%d)
+          mkdir -p backups/$BACKUP_DATE
+          echo "BACKUP_DATE=$BACKUP_DATE" >> $GITHUB_ENV
+          echo "BACKUP_DIR=backups/$BACKUP_DATE" >> $GITHUB_ENV
+
+      - name: Backup STATS namespace
+        if: contains(github.event.inputs.namespaces || 'all', 'stats') || contains(github.event.inputs.namespaces || 'all', 'all')
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Backing up STATS namespace..."
+
+          # List all keys
+          wrangler kv:key list --namespace-id="${{ secrets.STATS_KV_ID }}" > ${{ env.BACKUP_DIR }}/stats_keys.json 2>/dev/null || echo "[]" > ${{ env.BACKUP_DIR }}/stats_keys.json
+
+          KEY_COUNT=$(jq length ${{ env.BACKUP_DIR }}/stats_keys.json)
+          echo "Found $KEY_COUNT keys in STATS"
+
+          # Export key-value pairs
+          echo "[]" > ${{ env.BACKUP_DIR }}/stats_data.json
+          if [[ $KEY_COUNT -gt 0 ]]; then
+            for key in $(jq -r '.[].name' ${{ env.BACKUP_DIR }}/stats_keys.json | head -1000); do
+              value=$(wrangler kv:key get --namespace-id="${{ secrets.STATS_KV_ID }}" "$key" 2>/dev/null || echo "null")
+              jq --arg k "$key" --arg v "$value" '. += [{"key": $k, "value": $v}]' ${{ env.BACKUP_DIR }}/stats_data.json > tmp.json && mv tmp.json ${{ env.BACKUP_DIR }}/stats_data.json
+            done
+          fi
+
+          echo "STATS backup completed: $KEY_COUNT keys"
+
+      - name: Backup GALLERY namespace
+        if: contains(github.event.inputs.namespaces || 'all', 'gallery') || contains(github.event.inputs.namespaces || 'all', 'all')
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Backing up GALLERY namespace..."
+
+          # List all keys
+          wrangler kv:key list --namespace-id="${{ secrets.GALLERY_KV_ID }}" > ${{ env.BACKUP_DIR }}/gallery_keys.json 2>/dev/null || echo "[]" > ${{ env.BACKUP_DIR }}/gallery_keys.json
+
+          KEY_COUNT=$(jq length ${{ env.BACKUP_DIR }}/gallery_keys.json)
+          echo "Found $KEY_COUNT keys in GALLERY"
+
+          # Export key-value pairs
+          echo "[]" > ${{ env.BACKUP_DIR }}/gallery_data.json
+          if [[ $KEY_COUNT -gt 0 ]]; then
+            for key in $(jq -r '.[].name' ${{ env.BACKUP_DIR }}/gallery_keys.json | head -1000); do
+              value=$(wrangler kv:key get --namespace-id="${{ secrets.GALLERY_KV_ID }}" "$key" 2>/dev/null || echo "null")
+              jq --arg k "$key" --arg v "$value" '. += [{"key": $k, "value": $v}]' ${{ env.BACKUP_DIR }}/gallery_data.json > tmp.json && mv tmp.json ${{ env.BACKUP_DIR }}/gallery_data.json
+            done
+          fi
+
+          echo "GALLERY backup completed: $KEY_COUNT keys"
+
+      - name: Backup ANALYTICS namespace
+        if: contains(github.event.inputs.namespaces || 'all', 'analytics') || contains(github.event.inputs.namespaces || 'all', 'all')
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Backing up ANALYTICS namespace..."
+
+          # List all keys (limit to recent)
+          wrangler kv:key list --namespace-id="${{ secrets.ANALYTICS_KV_ID }}" > ${{ env.BACKUP_DIR }}/analytics_keys.json 2>/dev/null || echo "[]" > ${{ env.BACKUP_DIR }}/analytics_keys.json
+
+          KEY_COUNT=$(jq length ${{ env.BACKUP_DIR }}/analytics_keys.json)
+          echo "Found $KEY_COUNT keys in ANALYTICS"
+
+          # Export key-value pairs (limited for large datasets)
+          echo "[]" > ${{ env.BACKUP_DIR }}/analytics_data.json
+          if [[ $KEY_COUNT -gt 0 ]]; then
+            for key in $(jq -r '.[].name' ${{ env.BACKUP_DIR }}/analytics_keys.json | head -500); do
+              value=$(wrangler kv:key get --namespace-id="${{ secrets.ANALYTICS_KV_ID }}" "$key" 2>/dev/null || echo "null")
+              jq --arg k "$key" --arg v "$value" '. += [{"key": $k, "value": $v}]' ${{ env.BACKUP_DIR }}/analytics_data.json > tmp.json && mv tmp.json ${{ env.BACKUP_DIR }}/analytics_data.json
+            done
+          fi
+
+          echo "ANALYTICS backup completed: $KEY_COUNT keys"
+
+      - name: Create backup manifest
+        run: |
+          cat > ${{ env.BACKUP_DIR }}/manifest.json << EOF
+          {
+            "date": "${{ env.BACKUP_DATE }}",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "repository": "${{ github.repository }}",
+            "run_id": "${{ github.run_id }}",
+            "namespaces": {
+              "stats": {
+                "keys": $(jq length ${{ env.BACKUP_DIR }}/stats_keys.json 2>/dev/null || echo 0),
+                "file": "stats_data.json"
+              },
+              "gallery": {
+                "keys": $(jq length ${{ env.BACKUP_DIR }}/gallery_keys.json 2>/dev/null || echo 0),
+                "file": "gallery_data.json"
+              },
+              "analytics": {
+                "keys": $(jq length ${{ env.BACKUP_DIR }}/analytics_keys.json 2>/dev/null || echo 0),
+                "file": "analytics_data.json"
+              }
+            }
+          }
+          EOF
+
+          cat ${{ env.BACKUP_DIR }}/manifest.json
+
+      - name: Create backup archive
+        run: |
+          cd backups
+          tar -czvf backup-${{ env.BACKUP_DATE }}.tar.gz ${{ env.BACKUP_DATE }}/
+          ls -la backup-${{ env.BACKUP_DATE }}.tar.gz
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kv-backup-${{ env.BACKUP_DATE }}
+          path: backups/backup-${{ env.BACKUP_DATE }}.tar.gz
+          retention-days: ${{ env.BACKUP_RETENTION_DAYS }}
+
+      - name: Verify backup
+        run: |
+          echo "Verifying backup integrity..."
+
+          # Check archive can be extracted
+          cd backups
+          tar -tzf backup-${{ env.BACKUP_DATE }}.tar.gz > /dev/null
+
+          # Check file sizes
+          ARCHIVE_SIZE=$(du -h backup-${{ env.BACKUP_DATE }}.tar.gz | cut -f1)
+          echo "Backup archive size: $ARCHIVE_SIZE"
+
+          # Validate JSON files
+          for file in ${{ env.BACKUP_DATE }}/*.json; do
+            if jq empty "$file" 2>/dev/null; then
+              echo "Valid: $file"
+            else
+              echo "Invalid JSON: $file"
+              exit 1
+            fi
+          done
+
+          echo "Backup verification passed!"
+
+      - name: Create backup summary
+        run: |
+          echo "## Backup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Date**: ${{ env.BACKUP_DATE }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Retention**: ${{ env.BACKUP_RETENTION_DAYS }} days" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Namespace Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Namespace | Keys |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| STATS | $(jq length ${{ env.BACKUP_DIR }}/stats_keys.json 2>/dev/null || echo 0) |" >> $GITHUB_STEP_SUMMARY
+          echo "| GALLERY | $(jq length ${{ env.BACKUP_DIR }}/gallery_keys.json 2>/dev/null || echo 0) |" >> $GITHUB_STEP_SUMMARY
+          echo "| ANALYTICS | $(jq length ${{ env.BACKUP_DIR }}/analytics_keys.json 2>/dev/null || echo 0) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Archive Size**: $(du -h backups/backup-${{ env.BACKUP_DATE }}.tar.gz | cut -f1)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Backup workflow failed!"
+
+          if [[ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]]; then
+            curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              --data '{
+                "text": "ABADA Music Studio Backup FAILED",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Backup Alert"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "Daily backup for '"${{ env.BACKUP_DATE }}"' failed. Please check the <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run>."
+                    }
+                  }
+                ]
+              }' || true
+          fi

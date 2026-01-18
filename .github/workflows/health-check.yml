@@ -1,0 +1,210 @@
+# =============================================================================
+# ABADA Music Studio - Scheduled Health Check Workflow
+#
+# This workflow performs regular health checks on the production environment.
+#
+# Schedule:
+#   - Every 15 minutes during business hours (KST)
+#   - Every hour during off-hours
+#
+# Version: 1.0.0
+# Updated: 2026-01-19
+# =============================================================================
+
+name: Health Check
+
+on:
+  schedule:
+    # Every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      verbose:
+        description: 'Enable verbose output'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  DOMAIN_NAME: 'music.abada.kr'
+  PAGES_URL: 'abada-music.pages.dev'
+
+jobs:
+  health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check website availability
+        id: website
+        run: |
+          echo "Checking website availability..."
+
+          PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://${{ env.DOMAIN_NAME }}" --connect-timeout 10 --max-time 30 || echo "000")
+          PROD_TIME=$(curl -s -o /dev/null -w "%{time_total}" "https://${{ env.DOMAIN_NAME }}" --connect-timeout 10 --max-time 30 || echo "0")
+
+          echo "Production URL: HTTP $PROD_STATUS (${PROD_TIME}s)"
+
+          if [[ "$PROD_STATUS" == "200" ]]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+          echo "http_status=$PROD_STATUS" >> $GITHUB_OUTPUT
+          echo "response_time=$PROD_TIME" >> $GITHUB_OUTPUT
+
+      - name: Check API health
+        id: api
+        run: |
+          echo "Checking API health..."
+
+          API_RESPONSE=$(curl -s "https://${{ env.DOMAIN_NAME }}/api/health" --connect-timeout 10 --max-time 30 || echo "{}")
+          echo "API Response: $API_RESPONSE"
+
+          if echo "$API_RESPONSE" | grep -q '"status":"ok"'; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check critical pages
+        id: pages
+        run: |
+          echo "Checking critical pages..."
+
+          PAGES=("/" "/download" "/gallery" "/tutorial" "/faq" "/about")
+          FAILED=0
+          SLOW=0
+
+          for page in "${PAGES[@]}"; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://${{ env.DOMAIN_NAME }}${page}" --connect-timeout 10 --max-time 30 || echo "000")
+            TIME=$(curl -s -o /dev/null -w "%{time_total}" "https://${{ env.DOMAIN_NAME }}${page}" --connect-timeout 10 --max-time 30 || echo "0")
+
+            echo "Page $page: HTTP $STATUS (${TIME}s)"
+
+            if [[ "$STATUS" != "200" ]]; then
+              FAILED=$((FAILED + 1))
+            fi
+
+            if (( $(echo "$TIME > 2" | bc -l) )); then
+              SLOW=$((SLOW + 1))
+            fi
+          done
+
+          echo "failed_count=$FAILED" >> $GITHUB_OUTPUT
+          echo "slow_count=$SLOW" >> $GITHUB_OUTPUT
+
+          if [[ $FAILED -eq 0 ]]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check API endpoints
+        id: api_endpoints
+        run: |
+          echo "Checking API endpoints..."
+
+          # Stats endpoint
+          STATS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://${{ env.DOMAIN_NAME }}/api/stats" --connect-timeout 10 --max-time 30 || echo "000")
+          echo "Stats endpoint: HTTP $STATS_STATUS"
+
+          # Gallery endpoint
+          GALLERY_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://${{ env.DOMAIN_NAME }}/api/gallery" --connect-timeout 10 --max-time 30 || echo "000")
+          echo "Gallery endpoint: HTTP $GALLERY_STATUS"
+
+          if [[ "$STATS_STATUS" == "200" ]] && [[ "$GALLERY_STATUS" == "200" ]]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine overall health
+        id: overall
+        run: |
+          WEBSITE="${{ steps.website.outputs.status }}"
+          API="${{ steps.api.outputs.status }}"
+          PAGES="${{ steps.pages.outputs.status }}"
+          ENDPOINTS="${{ steps.api_endpoints.outputs.status }}"
+
+          echo "Website: $WEBSITE"
+          echo "API: $API"
+          echo "Pages: $PAGES"
+          echo "Endpoints: $ENDPOINTS"
+
+          if [[ "$WEBSITE" == "healthy" ]] && [[ "$API" == "healthy" ]] && [[ "$PAGES" == "healthy" ]] && [[ "$ENDPOINTS" == "healthy" ]]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+            echo "All health checks passed!"
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+            echo "Some health checks failed!"
+          fi
+
+      - name: Create health report
+        run: |
+          echo "## Health Check Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Time**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "**Domain**: ${{ env.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Website | ${{ steps.website.outputs.status == 'healthy' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API Health | ${{ steps.api.outputs.status == 'healthy' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Critical Pages | ${{ steps.pages.outputs.status == 'healthy' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API Endpoints | ${{ steps.api_endpoints.outputs.status == 'healthy' && 'PASS' || 'FAIL' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Overall Status**: ${{ steps.overall.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "- Response Time: ${{ steps.website.outputs.response_time }}s" >> $GITHUB_STEP_SUMMARY
+          echo "- Failed Pages: ${{ steps.pages.outputs.failed_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Slow Pages: ${{ steps.pages.outputs.slow_count }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send alert on failure
+        if: steps.overall.outputs.status == 'unhealthy'
+        run: |
+          echo "::error::Health check failed! Service may be degraded."
+
+          # Send Slack notification if webhook configured
+          if [[ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]]; then
+            curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              --data '{
+                "text": "ABADA Music Studio Health Check FAILED",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Health Check Alert"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Status:*\nUnhealthy"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Time:*\n'"$(date -u)"'"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "Please check the <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+                    }
+                  }
+                ]
+              }' || true
+          fi
+
+      - name: Fail workflow if unhealthy
+        if: steps.overall.outputs.status == 'unhealthy'
+        run: exit 1

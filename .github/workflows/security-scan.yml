@@ -1,0 +1,322 @@
+# =============================================================================
+# ABADA Music Studio - Security Scanning Workflow
+#
+# This workflow performs security scans on the codebase.
+#
+# Triggers:
+#   - On push to main
+#   - Weekly schedule (Mondays at 00:00 UTC)
+#   - Manual dispatch
+#
+# Version: 1.0.0
+# Updated: 2026-01-19
+# =============================================================================
+
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - 'package*.json'
+      - 'web/package*.json'
+  schedule:
+    # Weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Audit root dependencies
+        id: root_audit
+        continue-on-error: true
+        run: |
+          echo "Auditing root dependencies..."
+          npm audit --json > root-audit.json 2>&1 || true
+
+          CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' root-audit.json)
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' root-audit.json)
+
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+
+          echo "Root: $CRITICAL critical, $HIGH high vulnerabilities"
+
+      - name: Audit web dependencies
+        id: web_audit
+        continue-on-error: true
+        working-directory: web
+        run: |
+          echo "Auditing web dependencies..."
+          npm ci || npm install
+          npm audit --json > ../web-audit.json 2>&1 || true
+
+          CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' ../web-audit.json)
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' ../web-audit.json)
+
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+
+          echo "Web: $CRITICAL critical, $HIGH high vulnerabilities"
+
+      - name: Check for critical vulnerabilities
+        run: |
+          ROOT_CRITICAL=${{ steps.root_audit.outputs.critical || 0 }}
+          ROOT_HIGH=${{ steps.root_audit.outputs.high || 0 }}
+          WEB_CRITICAL=${{ steps.web_audit.outputs.critical || 0 }}
+          WEB_HIGH=${{ steps.web_audit.outputs.high || 0 }}
+
+          TOTAL_CRITICAL=$((ROOT_CRITICAL + WEB_CRITICAL))
+          TOTAL_HIGH=$((ROOT_HIGH + WEB_HIGH))
+
+          echo "Total: $TOTAL_CRITICAL critical, $TOTAL_HIGH high vulnerabilities"
+
+          if [[ $TOTAL_CRITICAL -gt 0 ]]; then
+            echo "::error::Critical vulnerabilities found!"
+            exit 1
+          fi
+
+          if [[ $TOTAL_HIGH -gt 5 ]]; then
+            echo "::warning::High number of high-severity vulnerabilities found"
+          fi
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-results
+          path: |
+            root-audit.json
+            web-audit.json
+          retention-days: 30
+
+  code-scan:
+    name: Code Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for potential secrets..."
+
+          # Patterns to check
+          PATTERNS=(
+            'api[_-]?key'
+            'api[_-]?secret'
+            'password'
+            'secret[_-]?key'
+            'private[_-]?key'
+            'access[_-]?token'
+            'auth[_-]?token'
+          )
+
+          FOUND=0
+
+          for pattern in "${PATTERNS[@]}"; do
+            # Search in JS/TS files, excluding node_modules and build directories
+            MATCHES=$(grep -rniE "$pattern\s*[:=]\s*['\"][^'\"]+['\"]" \
+              --include="*.js" \
+              --include="*.ts" \
+              --include="*.tsx" \
+              --exclude-dir=node_modules \
+              --exclude-dir=dist \
+              --exclude-dir=build \
+              --exclude-dir=.git \
+              . 2>/dev/null || true)
+
+            if [[ -n "$MATCHES" ]]; then
+              # Filter out safe patterns (environment variables, placeholders)
+              UNSAFE=$(echo "$MATCHES" | grep -vE "(process\.env|import\.meta\.env|YOUR_|PLACEHOLDER|example|sample)" || true)
+
+              if [[ -n "$UNSAFE" ]]; then
+                echo "Potential secret found for pattern: $pattern"
+                echo "$UNSAFE"
+                FOUND=$((FOUND + 1))
+              fi
+            fi
+          done
+
+          if [[ $FOUND -gt 0 ]]; then
+            echo "::warning::$FOUND potential hardcoded secrets found. Please review."
+          else
+            echo "No hardcoded secrets detected."
+          fi
+
+      - name: Check for sensitive files
+        run: |
+          echo "Checking for sensitive files..."
+
+          SENSITIVE_FILES=(
+            ".env"
+            ".env.local"
+            ".env.production"
+            "credentials.json"
+            "secrets.json"
+            "*.pem"
+            "*.key"
+            "id_rsa"
+            "id_dsa"
+          )
+
+          FOUND=0
+
+          for pattern in "${SENSITIVE_FILES[@]}"; do
+            MATCHES=$(find . -name "$pattern" -not -path "./node_modules/*" -not -path "./.git/*" 2>/dev/null || true)
+
+            if [[ -n "$MATCHES" ]]; then
+              echo "Sensitive file found: $MATCHES"
+              FOUND=$((FOUND + 1))
+            fi
+          done
+
+          if [[ $FOUND -gt 0 ]]; then
+            echo "::warning::$FOUND sensitive files found. Ensure they are in .gitignore."
+          else
+            echo "No sensitive files detected."
+          fi
+
+      - name: Check .gitignore coverage
+        run: |
+          echo "Verifying .gitignore coverage..."
+
+          REQUIRED_IGNORES=(
+            ".env"
+            ".env.local"
+            "node_modules"
+            "dist"
+            "build"
+            "*.log"
+          )
+
+          MISSING=0
+
+          for pattern in "${REQUIRED_IGNORES[@]}"; do
+            if ! grep -q "$pattern" .gitignore 2>/dev/null; then
+              echo "Missing from .gitignore: $pattern"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+
+          if [[ $MISSING -gt 0 ]]; then
+            echo "::warning::$MISSING patterns missing from .gitignore"
+          else
+            echo ".gitignore coverage is complete."
+          fi
+
+  security-headers-check:
+    name: Security Headers Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check security headers
+        run: |
+          echo "Checking security headers on production..."
+
+          DOMAIN="music.abada.kr"
+
+          # Get headers
+          HEADERS=$(curl -sI "https://$DOMAIN" 2>/dev/null || echo "")
+
+          if [[ -z "$HEADERS" ]]; then
+            echo "::warning::Could not fetch headers from $DOMAIN"
+            exit 0
+          fi
+
+          echo "Response Headers:"
+          echo "$HEADERS"
+          echo ""
+
+          # Check required headers
+          REQUIRED_HEADERS=(
+            "x-content-type-options"
+            "x-frame-options"
+            "strict-transport-security"
+          )
+
+          MISSING=0
+
+          for header in "${REQUIRED_HEADERS[@]}"; do
+            if echo "$HEADERS" | grep -qi "$header"; then
+              echo "Found: $header"
+            else
+              echo "Missing: $header"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+
+          if [[ $MISSING -gt 0 ]]; then
+            echo "::warning::$MISSING security headers missing"
+          else
+            echo "All required security headers present."
+          fi
+
+  create-summary:
+    name: Create Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-audit, code-scan, security-headers-check]
+    if: always()
+
+    steps:
+      - name: Create summary
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Date**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Scan | ${{ needs.code-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Headers | ${{ needs.security-headers-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.dependency-audit.result }}" == "failure" ]] || \
+             [[ "${{ needs.code-scan.result }}" == "failure" ]]; then
+            echo "::error::Security scan found issues that require attention."
+          fi
+
+      - name: Notify on critical findings
+        if: needs.dependency-audit.result == 'failure'
+        run: |
+          if [[ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]]; then
+            curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              --data '{
+                "text": "ABADA Music Studio Security Scan Alert",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Security Alert"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "Security scan found critical vulnerabilities. Please review the <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|scan results>."
+                    }
+                  }
+                ]
+              }' || true
+          fi

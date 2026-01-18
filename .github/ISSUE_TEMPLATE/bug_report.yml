@@ -1,0 +1,158 @@
+name: Bug Report
+description: Report a bug or issue with ABADA Music Studio
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us resolve the issue quickly.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight Checklist
+      description: Please ensure you've completed these steps before submitting
+      options:
+        - label: I have searched existing issues to ensure this hasn't been reported
+          required: true
+        - label: I have read the FAQ (https://music.abada.kr/faq)
+          required: true
+        - label: I am using the latest version of ABADA Music Studio
+          required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating System
+      description: What OS are you using?
+      options:
+        - Windows 10 (x64)
+        - Windows 10 (x86)
+        - Windows 11 (x64)
+        - macOS 12 Monterey (Intel)
+        - macOS 13 Ventura (Intel)
+        - macOS 13 Ventura (Apple Silicon M1/M2)
+        - macOS 14 Sonoma (Intel)
+        - macOS 14 Sonoma (Apple Silicon M1/M2)
+        - Ubuntu 20.04 LTS
+        - Ubuntu 22.04 LTS
+        - Ubuntu 24.04 LTS
+        - Fedora 38+
+        - Arch Linux
+        - Other Linux (specify in description)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ABADA Music Studio Version
+      description: What version are you running? (Check in About or --version)
+      placeholder: "e.g., v1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which component has the issue?
+      options:
+        - Installer (installation process)
+        - Application (music generation)
+        - Website (music.abada.kr)
+        - Gallery (community uploads)
+        - Documentation
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: |
+        What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Enter '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Messages / Logs
+      description: If applicable, paste any error messages or relevant logs
+      placeholder: |
+        Paste error messages here (if any)
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain the problem
+      placeholder: Drag and drop images here
+
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Information
+      description: Please provide additional system details
+      placeholder: |
+        - CPU: (e.g., Intel i7-10700K, AMD Ryzen 5600X, Apple M1)
+        - RAM: (e.g., 16GB)
+        - GPU: (e.g., NVIDIA RTX 3060, Apple M1 GPU, None)
+        - Free Disk Space: (e.g., 50GB)
+        - Python Version (if applicable): (e.g., 3.10.8)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem
+      placeholder: |
+        - Have you tried any workarounds?
+        - Does this happen consistently or intermittently?
+        - Any other relevant information?
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Would you like to work on this issue?
+      options:
+        - label: I would like to work on fixing this bug

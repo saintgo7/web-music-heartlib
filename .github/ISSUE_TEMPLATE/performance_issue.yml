@@ -1,0 +1,183 @@
+name: Performance Issue
+description: Report slow performance, high memory usage, or crashes
+title: "[Performance]: "
+labels: ["performance", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a performance issue! This helps us optimize ABADA Music Studio for everyone.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight Checklist
+      description: Please ensure you've completed these steps
+      options:
+        - label: I have closed other applications to isolate the issue
+          required: true
+        - label: I have checked system requirements (8GB RAM minimum)
+          required: true
+        - label: I am using the latest version
+          required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Type of Performance Issue
+      description: What kind of performance problem are you experiencing?
+      options:
+        - Slow installation
+        - Slow model loading
+        - Slow music generation
+        - High memory usage
+        - High CPU usage
+        - High GPU usage
+        - Application crash
+        - Application freeze/hang
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating System
+      options:
+        - Windows 10 (x64)
+        - Windows 11 (x64)
+        - macOS 12+ (Intel)
+        - macOS 12+ (Apple Silicon)
+        - Ubuntu 20.04/22.04 LTS
+        - Other Linux
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ABADA Music Studio Version
+      placeholder: "e.g., v1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: system-specs
+    attributes:
+      label: System Specifications
+      description: Provide detailed system information
+      placeholder: |
+        - CPU: (e.g., Intel i5-9400F, AMD Ryzen 5 3600, Apple M1)
+        - CPU Cores/Threads: (e.g., 6 cores / 12 threads)
+        - RAM: (e.g., 16GB DDR4-3200)
+        - GPU: (e.g., NVIDIA RTX 3060 6GB, AMD RX 6600, Intel UHD 630)
+        - Storage: (e.g., NVMe SSD, SATA SSD, HDD)
+        - Free Disk Space: (e.g., 50GB)
+        - OS Version: (e.g., Windows 11 22H2, macOS 14.1, Ubuntu 22.04.3)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Describe the performance problem in detail
+      placeholder: |
+        What is slow or problematic?
+        When does it happen?
+        How long does it take vs. how long should it take?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the performance issue
+      placeholder: |
+        1. Start application
+        2. Click "Generate" with [specific lyrics/tags]
+        3. Wait for generation
+        4. Observe [slow generation / high memory / crash]
+    validations:
+      required: true
+
+  - type: textarea
+    id: measurements
+    attributes:
+      label: Performance Measurements
+      description: If possible, provide specific measurements
+      placeholder: |
+        - Generation time: X minutes (expected: Y minutes)
+        - Memory usage: X GB (peak)
+        - CPU usage: X% (sustained)
+        - GPU usage: X% (if applicable)
+        - Disk usage: X MB/s
+      render: shell
+
+  - type: dropdown
+    id: gpu-mode
+    attributes:
+      label: GPU Mode
+      description: Is GPU acceleration being used?
+      options:
+        - GPU (NVIDIA CUDA)
+        - GPU (Apple MPS/Metal)
+        - CPU only (no GPU available)
+        - CPU only (GPU not detected)
+        - Unknown
+    validations:
+      required: true
+
+  - type: textarea
+    id: task-manager
+    attributes:
+      label: Task Manager / Activity Monitor Stats
+      description: What does Task Manager/Activity Monitor show during the issue?
+      placeholder: |
+        CPU:
+        Memory:
+        GPU:
+        Disk:
+        Network:
+
+  - type: textarea
+    id: comparison
+    attributes:
+      label: Comparison with Expected Performance
+      description: How does this compare to expected performance?
+      placeholder: |
+        - Documentation says: X minutes
+        - Other users report: Y minutes
+        - I experience: Z minutes
+        - Difference: __% slower
+
+  - type: textarea
+    id: workarounds
+    attributes:
+      label: Workarounds Attempted
+      description: What have you tried to improve performance?
+      placeholder: |
+        - Closing other applications: [Result]
+        - Reducing generation settings: [Result]
+        - Changing GPU/CPU mode: [Result]
+        - Reinstalling: [Result]
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Messages / Crash Logs
+      description: If applicable, paste error messages or crash logs
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: |
+        - Does the issue happen every time or intermittently?
+        - Are there specific lyrics/tags that trigger this?
+        - Did this work better in a previous version?

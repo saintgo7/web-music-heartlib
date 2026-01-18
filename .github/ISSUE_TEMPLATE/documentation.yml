@@ -1,0 +1,153 @@
+name: Documentation Improvement
+description: Suggest improvements to documentation
+title: "[Docs]: "
+labels: ["documentation", "needs-review"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve our documentation! Clear docs help everyone use ABADA Music Studio better.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight Checklist
+      options:
+        - label: I have searched existing documentation issues
+          required: true
+        - label: I have read the current documentation
+          required: true
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: Which type of documentation needs improvement?
+      options:
+        - README
+        - Installation Guide
+        - User Tutorial
+        - API Documentation
+        - Developer Guide (CONTRIBUTING.md)
+        - FAQ
+        - Troubleshooting Guide
+        - Architecture Documentation
+        - Code Comments
+        - Website Content
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Document Location
+      description: File path or URL of the documentation
+      placeholder: "e.g., docs/INSTALLATION.md or https://music.abada.kr/tutorial"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-category
+    attributes:
+      label: Issue Category
+      description: What kind of documentation issue is this?
+      options:
+        - Missing information
+        - Outdated information
+        - Incorrect information
+        - Unclear/confusing explanation
+        - Poor formatting
+        - Broken links
+        - Missing examples
+        - Missing screenshots
+        - Translation needed
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current State
+      description: What does the documentation currently say? (quote or screenshot)
+      placeholder: |
+        Current text:
+        "..."
+
+        Or drag and drop screenshot here
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: What's wrong or missing?
+      placeholder: |
+        The current documentation is problematic because...
+        Users might be confused by...
+        This information is missing...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed Improvement
+      description: How should the documentation be improved?
+      placeholder: |
+        Suggested text:
+        "..."
+
+        Or describe what should be added/changed
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples (if applicable)
+      description: Provide examples that should be included
+      placeholder: |
+        Example 1:
+        ```
+        code or screenshot here
+        ```
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who is this documentation for?
+      options:
+        - Beginners (first-time users)
+        - Intermediate users
+        - Advanced users
+        - Developers (contributors)
+        - All users
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution-intent
+    attributes:
+      label: Can you help improve this?
+      options:
+        - label: I can write the improved documentation
+        - label: I can provide better examples
+        - label: I can add screenshots
+        - label: I can translate to another language
+        - label: I can review the improved version
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that would help
+      placeholder: |
+        - Related documentation that should also be updated
+        - References to good examples
+        - User feedback about this topic

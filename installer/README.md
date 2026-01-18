@@ -9,6 +9,30 @@ This directory contains installer scripts and build configurations for:
 - **macOS** (Intel/Apple Silicon) - Shell script + DMG
 - **Linux** (Ubuntu, Fedora, Arch) - Shell script
 
+## macOS Installation (Important!)
+
+macOS Gatekeeper blocks unsigned apps by default. To install:
+
+### Method 1: Right-Click to Open
+1. Download `MuLa_Installer.dmg`
+2. Right-click (or Control + Click) the DMG file
+3. Select "Open"
+4. Click "Open" in the security dialog
+
+### Method 2: Remove Quarantine Attribute
+```bash
+cd ~/Downloads
+xattr -cr MuLa_Installer.dmg
+open MuLa_Installer.dmg
+```
+
+### Method 3: System Settings
+1. Try to open the DMG normally
+2. Go to System Settings → Privacy & Security
+3. Click "Open Anyway" next to the security message
+
+**Note:** The installer is not code-signed with an Apple Developer ID. This is safe open-source software, but macOS will show security warnings.
+
 ## Directory Structure
 
 ```

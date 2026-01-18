@@ -283,6 +283,14 @@ jobs:
           </plist>
           EOF
 
+      - name: Ad-hoc Code Sign
+        run: |
+          # Ad-hoc signing (no Apple Developer ID required)
+          # This provides basic code integrity verification
+          codesign --force --deep --sign - "MuLa Installer.app"
+
+          echo "App bundle signed with ad-hoc signature"
+
       - name: Create DMG
         run: |
           create-dmg \
@@ -293,6 +301,10 @@ jobs:
             --no-internet-enable \
             "MuLa_Installer.dmg" \
             "MuLa Installer.app"
+
+          # Sign the DMG too
+          codesign --force --sign - "MuLa_Installer.dmg"
+          echo "DMG signed with ad-hoc signature"
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4

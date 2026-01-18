@@ -56,35 +56,33 @@ jobs:
           choco install nsis -y
           echo "C:\Program Files (x86)\NSIS" >> $GITHUB_PATH
 
-      - name: Install NSIS plugins
-        shell: powershell
-        run: |
-          # Download nsisunz plugin from GitHub release
-          $nsisPluginDir = "C:\Program Files (x86)\NSIS\Plugins"
-
-          Write-Host "Downloading nsisunz plugin..."
-          # Use direct DLL download from a reliable source
-          Invoke-WebRequest -Uri "https://github.com/past-due/nsisunz/releases/download/v1.0/nsisunz.dll" -OutFile "$env:TEMP\nsisunz.dll"
-
-          Write-Host "Copying plugin to NSIS..."
-          New-Item -ItemType Directory -Force -Path "$nsisPluginDir\x86-unicode"
-          Copy-Item "$env:TEMP\nsisunz.dll" "$nsisPluginDir\x86-unicode\nsisunz.dll" -Force
-
-          Write-Host "Verifying plugin installation..."
-          if (Test-Path "$nsisPluginDir\x86-unicode\nsisunz.dll") {
-            Write-Host "Plugin installed successfully at $nsisPluginDir\x86-unicode\nsisunz.dll"
-          } else {
-            Write-Error "Plugin installation failed"
-            exit 1
-          }
-
-      - name: Download Python Embedded (x64)
+      - name: Download and Extract Python Embedded (x64)
         shell: powershell
         run: |
           $pythonUrl = "https://www.python.org/ftp/python/${{ env.PYTHON_VERSION }}/python-${{ env.PYTHON_VERSION }}-embed-amd64.zip"
           New-Item -ItemType Directory -Force -Path "installer/windows/build"
-          Invoke-WebRequest -Uri $pythonUrl -OutFile "installer/windows/build/python-${{ env.PYTHON_VERSION }}-embed-amd64.zip"
-          Write-Host "Downloaded Python embedded package"
+
+          Write-Host "Downloading Python embedded package..."
+          Invoke-WebRequest -Uri $pythonUrl -OutFile "installer/windows/build/python-embed.zip"
+
+          Write-Host "Extracting Python..."
+          New-Item -ItemType Directory -Force -Path "installer/windows/build/python"
+          Expand-Archive -Path "installer/windows/build/python-embed.zip" -DestinationPath "installer/windows/build/python" -Force
+
+          Write-Host "Python extracted successfully"
+          Get-ChildItem "installer/windows/build/python" | Select-Object Name
+
+      - name: Modify NSIS script to use pre-extracted Python
+        shell: powershell
+        run: |
+          $nsiFile = "installer/windows/MuLaInstaller_x64.nsi"
+          $content = Get-Content $nsiFile -Raw
+
+          # Replace nsisunz extraction with SetOutPath and File commands
+          $content = $content -replace 'nsisunz::Unzip "\$INSTDIR\\python\\python-embed\.zip" "\$INSTDIR\\python"[\r\n\s]+Delete "\$INSTDIR\\python\\python-embed\.zip"', 'SetOutPath "$INSTDIR\python"`r`n    File /r "build\python\*.*"'
+
+          $content | Set-Content $nsiFile
+          Write-Host "Modified NSIS script to use pre-extracted Python files"
 
       - name: Build NSIS Installer (x64)
         shell: cmd
@@ -123,34 +121,21 @@ jobs:
       - name: Install NSIS
         run: choco install nsis -y
 
-      - name: Install NSIS plugins
-        shell: powershell
-        run: |
-          # Download nsisunz plugin from GitHub release
-          $nsisPluginDir = "C:\Program Files (x86)\NSIS\Plugins"
-
-          Write-Host "Downloading nsisunz plugin..."
-          # Use direct DLL download from a reliable source
-          Invoke-WebRequest -Uri "https://github.com/past-due/nsisunz/releases/download/v1.0/nsisunz.dll" -OutFile "$env:TEMP\nsisunz.dll"
-
-          Write-Host "Copying plugin to NSIS..."
-          New-Item -ItemType Directory -Force -Path "$nsisPluginDir\x86-unicode"
-          Copy-Item "$env:TEMP\nsisunz.dll" "$nsisPluginDir\x86-unicode\nsisunz.dll" -Force
-
-          Write-Host "Verifying plugin installation..."
-          if (Test-Path "$nsisPluginDir\x86-unicode\nsisunz.dll") {
-            Write-Host "Plugin installed successfully at $nsisPluginDir\x86-unicode\nsisunz.dll"
-          } else {
-            Write-Error "Plugin installation failed"
-            exit 1
-          }
-
-      - name: Download Python Embedded (x86)
+      - name: Download and Extract Python Embedded (x86)
         shell: powershell
         run: |
           $pythonUrl = "https://www.python.org/ftp/python/${{ env.PYTHON_VERSION }}/python-${{ env.PYTHON_VERSION }}-embed-win32.zip"
           New-Item -ItemType Directory -Force -Path "installer/windows/build"
-          Invoke-WebRequest -Uri $pythonUrl -OutFile "installer/windows/build/python-${{ env.PYTHON_VERSION }}-embed-win32.zip"
+
+          Write-Host "Downloading Python embedded package..."
+          Invoke-WebRequest -Uri $pythonUrl -OutFile "installer/windows/build/python-embed.zip"
+
+          Write-Host "Extracting Python..."
+          New-Item -ItemType Directory -Force -Path "installer/windows/build/python"
+          Expand-Archive -Path "installer/windows/build/python-embed.zip" -DestinationPath "installer/windows/build/python" -Force
+
+          Write-Host "Python extracted successfully"
+          Get-ChildItem "installer/windows/build/python" | Select-Object Name
 
       - name: Create x86 NSIS script
         shell: powershell
@@ -168,7 +153,11 @@ jobs:
           # Force CPU mode for x86 (no CUDA)
           $content = $content -replace '\$\{If\} \$GPU_TYPE == "cuda"', '${If} 1 == 0'
 
+          # Replace nsisunz extraction with pre-extracted files
+          $content = $content -replace 'nsisunz::Unzip "\$INSTDIR\\python\\python-embed\.zip" "\$INSTDIR\\python"[\r\n\s]+Delete "\$INSTDIR\\python\\python-embed\.zip"', 'SetOutPath "$INSTDIR\python"`r`n    File /r "build\python\*.*"'
+
           $content | Set-Content "installer/windows/MuLaInstaller_x86.nsi"
+          Write-Host "Modified x86 NSIS script to use pre-extracted Python files"
 
       - name: Build NSIS Installer (x86)
         shell: cmd

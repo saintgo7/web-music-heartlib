@@ -3,112 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>보안 검토 - ABADA Music Studio</title>
+    <title>Security Review - ABADA Music Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
-    <style>
-        :root { --primary: #3b82f6; --dark: #1f2937; --light: #f3f4f6; }
-        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; overflow-y: auto; }
-        .sidebar-nav a { display: block; padding: 12px 24px; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
-        .sidebar-nav a.active { background: var(--light); border-left-color: var(--primary); color: var(--primary); }
-        .main-content { margin-left: 280px; padding: 40px; }
-        .header { background: white; padding: 40px; border-radius: 12px; margin-bottom: 40px; }
-        .header h1 { font-size: 36px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .section-title { font-size: 24px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 2px solid var(--primary); }
-    </style>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">ABADA v1.0.0</h2>
+                <p class="text-sm text-gray-500 mt-1">Development Report</p>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Dashboard</a>
+                <a href="development-plan.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Development Plan</a>
+                <a href="development-log.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Development Log</a>
+                <a href="architecture.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Architecture</a>
+                <a href="error-analysis.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Error Analysis</a>
+                <a href="error-solutions.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Error Solutions</a>
+                <a href="performance-analysis.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Performance</a>
+                <a href="optimization.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Optimization</a>
+                <a href="testing-report.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Testing</a>
+                <a href="deployment-issues.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Deployment</a>
+                <a href="security-review.html" class="block px-4 py-2 text-gray-700 bg-gray-100 rounded font-semibold">Security</a>
+                <a href="conclusion.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Conclusion</a>
+            </nav>
+        </aside>
 
-    <div class="sidebar">
-        <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
-            <h2 style="font-size: 18px; font-weight: 700;">📊 ABADA v1.0.0</h2>
-            <p style="font-size: 12px; color: #6b7280;">종합 개발 보고서</p>
-        </div>
-        <nav class="sidebar-nav" style="padding: 24px 0;">
-            <a href="index.html">🏠 대시보드</a>
-            <a href="development-plan.html">📋 개발계획</a>
-            <a href="development-log.html">📝 개발로그</a>
-            <a href="architecture.html">🏗️ 아키텍처</a>
-            <a href="error-analysis.html">🔴 에러 분석</a>
-            <a href="error-solutions.html">✅ 해결방안</a>
-            <a href="deployment-issues.html">⚡ 배포 이슈</a>
-            <a href="performance-analysis.html">📈 성능분석</a>
-            <a href="optimization.html">🚀 최적화</a>
-            <a href="testing-report.html">🧪 테스트</a>
-            <a href="security-review.html" class="active">🔐 보안</a>
-            <a href="conclusion.html">🎉 결론</a>
-        </nav>
-    </div>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <div class="max-w-6xl mx-auto p-8">
+                <!-- Header -->
+                <div class="mb-12">
+                    <div class="flex items-center gap-4 mb-6">
+                        <svg class="w-12 h-12 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <div>
+                            <h1 class="text-4xl font-bold text-gray-900">Security Review</h1>
+                            <p class="text-lg text-gray-600 mt-1">OWASP Compliance & Best Practices</p>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h1>🔐 보안 검토</h1>
-            <p>보안 헤더, CORS 설정, OWASP 준수, 취약점 0</p>
-        </div>
+                <!-- Security Status -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Security Status</h2>
+                    <div class="space-y-4">
+                        <div class="bg-white border-l-4 border-green-500 p-6 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">NPM Audit Results</h3>
+                                    <p class="text-gray-600 text-sm mt-1">0 vulnerabilities found</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">PASS</span>
+                            </div>
+                        </div>
 
-        <h2 class="section-title">✅ 보안 현황</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <div style="display: grid; gap: 12px;">
-                <div style="padding: 12px; background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 4px;">
-                    <p style="font-weight: 700; color: #065f46; margin-bottom: 4px;">✅ npm audit: 0 vulnerabilities</p>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0;">모든 의존성 안전</p>
-                </div>
-                <div style="padding: 12px; background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 4px;">
-                    <p style="font-weight: 700; color: #065f46; margin-bottom: 4px;">✅ HTTPS/TLS 1.3</p>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0;">Cloudflare 자동 암호화</p>
-                </div>
-                <div style="padding: 12px; background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 4px;">
-                    <p style="font-weight: 700; color: #065f46; margin-bottom: 4px;">✅ CORS 설정 완료</p>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0;">도메인 기반 접근 제어</p>
-                </div>
-                <div style="padding: 12px; background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 4px;">
-                    <p style="font-weight: 700; color: #065f46; margin-bottom: 4px;">✅ CSP 정책 적용</p>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0;">XSS 공격 방어</p>
+                        <div class="bg-white border-l-4 border-green-500 p-6 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">HTTPS/TLS 1.3</h3>
+                                    <p class="text-gray-600 text-sm mt-1">Cloudflare managed certificate</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">PASS</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border-l-4 border-green-500 p-6 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">CORS Configuration</h3>
+                                    <p class="text-gray-600 text-sm mt-1">Domain-based access control</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">PASS</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border-l-4 border-green-500 p-6 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Content Security Policy</h3>
+                                    <p class="text-gray-600 text-sm mt-1">Prevents XSS attacks</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">PASS</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- OWASP Top 10 -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">OWASP Top 10 Compliance</h2>
+                    <table class="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Category</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">1. Injection</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Input validation & parameterized queries</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">2. Authentication</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Secure session management</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">3. Sensitive Data</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">HTTPS encryption enabled</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">4. XML External Entities</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">XXE protection configured</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">5. Access Control</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Role-based permissions</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">6. Security Misconfiguration</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Hardened configuration</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">7. XSS</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">CSP + Input encoding</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">8. Insecure Deserialization</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Safe JSON parsing</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">9. Using Components with Known Vulnerabilities</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Regular dependency updates</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">10. Insufficient Logging</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">Security event logging</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Compliant</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Security Recommendations -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Additional Recommendations</h2>
+                    <ul class="space-y-3">
+                        <li class="flex gap-3">
+                            <span class="bg-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                            <p class="text-gray-600">Enable rate limiting on API endpoints</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="bg-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                            <p class="text-gray-600">Implement DDOS protection through Cloudflare</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="bg-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                            <p class="text-gray-600">Regular security audits and penetration testing</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="bg-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
+                            <p class="text-gray-600">Monitor security advisories for dependencies</p>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Navigation -->
+                <div class="flex gap-4">
+                    <a href="deployment-issues.html" class="flex-1 bg-gray-200 text-gray-900 py-3 px-4 rounded font-semibold hover:bg-gray-300 text-center">← Back</a>
+                    <a href="conclusion.html" class="flex-1 bg-gray-900 text-white py-3 px-4 rounded font-semibold hover:bg-gray-800 text-center">Next →</a>
                 </div>
             </div>
-        </div>
-
-        <h2 class="section-title">📋 OWASP Top 10 준수</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <tbody>
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 12px;">1. Injection</td>
-                        <td style="padding: 12px; text-align: right;"><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓</span></td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 12px;">2. Authentication</td>
-                        <td style="padding: 12px; text-align: right;"><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓</span></td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 12px;">3. Sensitive Data</td>
-                        <td style="padding: 12px; text-align: right;"><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓</span></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px;">...더 많은 항목</td>
-                        <td style="padding: 12px; text-align: right;"><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="display: flex; gap: 16px; margin-top: 32px;">
-            <a href="testing-report.html" style="text-decoration: none; flex: 1;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">⬅️</div>
-                    <p style="font-weight: 700;">테스트</p>
-                </div>
-            </a>
-            <a href="conclusion.html" style="text-decoration: none; flex: 1;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">➡️</div>
-                    <p style="font-weight: 700;">결론</p>
-                </div>
-            </a>
-        </div>
-        <div style="text-align: center; padding: 32px; color: #9ca3af; font-size: 12px; margin-top: 32px;">
-            <p>© 2026 ABADA Music Studio. All rights reserved.</p>
-        </div>
+        </main>
     </div>
 </body>
 </html>

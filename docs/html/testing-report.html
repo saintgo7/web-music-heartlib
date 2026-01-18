@@ -3,196 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>테스트 보고서 - ABADA Music Studio</title>
+    <title>Testing Report - ABADA Music Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
-    <style>
-        :root { --primary: #3b82f6; --dark: #1f2937; --light: #f3f4f6; }
-        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; overflow-y: auto; }
-        .sidebar-nav a { display: block; padding: 12px 24px; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
-        .sidebar-nav a.active { background: var(--light); border-left-color: var(--primary); color: var(--primary); }
-        .main-content { margin-left: 280px; padding: 40px; }
-        .header { background: white; padding: 40px; border-radius: 12px; margin-bottom: 40px; }
-        .header h1 { font-size: 36px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .section-title { font-size: 24px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 2px solid var(--primary); }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        th { background: var(--light); font-weight: 600; }
-    </style>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">ABADA v1.0.0</h2>
+                <p class="text-sm text-gray-500 mt-1">Development Report</p>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Dashboard</a>
+                <a href="development-plan.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Development Plan</a>
+                <a href="development-log.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Development Log</a>
+                <a href="architecture.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Architecture</a>
+                <a href="error-analysis.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Error Analysis</a>
+                <a href="error-solutions.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Error Solutions</a>
+                <a href="performance-analysis.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Performance</a>
+                <a href="optimization.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Optimization</a>
+                <a href="testing-report.html" class="block px-4 py-2 text-gray-700 bg-gray-100 rounded font-semibold">Testing</a>
+                <a href="deployment-issues.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Deployment</a>
+                <a href="security-review.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Security</a>
+                <a href="conclusion.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Conclusion</a>
+            </nav>
+        </aside>
 
-    <div class="sidebar">
-        <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
-            <h2 style="font-size: 18px; font-weight: 700;">📊 ABADA v1.0.0</h2>
-            <p style="font-size: 12px; color: #6b7280;">종합 개발 보고서</p>
-        </div>
-        <nav class="sidebar-nav" style="padding: 24px 0;">
-            <a href="index.html">🏠 대시보드</a>
-            <a href="development-plan.html">📋 개발계획</a>
-            <a href="development-log.html">📝 개발로그</a>
-            <a href="architecture.html">🏗️ 아키텍처</a>
-            <a href="error-analysis.html">🔴 에러 분석</a>
-            <a href="error-solutions.html">✅ 해결방안</a>
-            <a href="deployment-issues.html">⚡ 배포 이슈</a>
-            <a href="performance-analysis.html">📈 성능분석</a>
-            <a href="optimization.html">🚀 최적화</a>
-            <a href="testing-report.html" class="active">🧪 테스트</a>
-            <a href="security-review.html">🔐 보안</a>
-            <a href="conclusion.html">🎉 결론</a>
-        </nav>
-    </div>
-
-    <div class="main-content">
-        <div class="header">
-            <h1>🧪 테스트 보고서</h1>
-            <p>E2E 테스트 (48개), 성능 테스트 (5개 시나리오), 테스트 자동화</p>
-        </div>
-
-        <h2 class="section-title">📊 테스트 통계</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <tr>
-                    <td><strong>E2E 테스트</strong></td>
-                    <td><strong>48개</strong></td>
-                    <td>Pass Rate: 98%+</td>
-                </tr>
-                <tr>
-                    <td><strong>성능 테스트</strong></td>
-                    <td><strong>5개 시나리오</strong></td>
-                    <td>부하 테스트 완료</td>
-                </tr>
-                <tr>
-                    <td><strong>코드 커버리지</strong></td>
-                    <td><strong>85%+</strong></td>
-                    <td>주요 로직 커버됨</td>
-                </tr>
-                <tr>
-                    <td><strong>Lighthouse CI</strong></td>
-                    <td><strong>90+</strong></td>
-                    <td>모든 페이지 기준 충족</td>
-                </tr>
-            </table>
-        </div>
-
-        <h2 class="section-title">✅ E2E 테스트 (Playwright)</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>페이지</th>
-                        <th>테스트 수</th>
-                        <th>상태</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>HomePage</td>
-                        <td>8개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>DownloadPage</td>
-                        <td>6개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>GalleryPage</td>
-                        <td>6개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>TutorialPage</td>
-                        <td>6개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>FAQPage</td>
-                        <td>5개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>AboutPage</td>
-                        <td>4개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>Navigation</td>
-                        <td>5개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>API Integration</td>
-                        <td>8개</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h2 class="section-title">⚡ 성능 테스트 (k6)</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>시나리오</th>
-                        <th>동시 사용자</th>
-                        <th>평균 응답</th>
-                        <th>상태</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Baseline</td>
-                        <td>1</td>
-                        <td>150ms</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>Load</td>
-                        <td>100</td>
-                        <td>240ms</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>Stress</td>
-                        <td>1,000</td>
-                        <td>850ms</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                    <tr>
-                        <td>Spike</td>
-                        <td>500 → 2,000</td>
-                        <td>1,200ms</td>
-                        <td><span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 12px;">⚠ Acceptable</span></td>
-                    </tr>
-                    <tr>
-                        <td>API</td>
-                        <td>100</td>
-                        <td>180ms</td>
-                        <td><span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 12px;">✓ Pass</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="display: flex; gap: 16px; margin-top: 32px;">
-            <a href="optimization.html" style="text-decoration: none; flex: 1;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">⬅️</div>
-                    <p style="font-weight: 700;">최적화</p>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <div class="max-w-6xl mx-auto p-8">
+                <!-- Header -->
+                <div class="mb-12">
+                    <div class="flex items-center gap-4 mb-6">
+                        <svg class="w-12 h-12 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <div>
+                            <h1 class="text-4xl font-bold text-gray-900">Testing Report</h1>
+                            <p class="text-lg text-gray-600 mt-1">E2E & Performance Tests</p>
+                        </div>
+                    </div>
                 </div>
-            </a>
-            <a href="security-review.html" style="text-decoration: none; flex: 1;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">➡️</div>
-                    <p style="font-weight: 700;">보안</p>
+
+                <!-- Test Summary -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Test Summary</h2>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">E2E Tests</p>
+                            <p class="text-4xl font-bold text-gray-900">48</p>
+                            <p class="text-sm text-green-600 font-semibold mt-2">Pass Rate: 98%</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">Performance Tests</p>
+                            <p class="text-4xl font-bold text-gray-900">5</p>
+                            <p class="text-sm text-green-600 font-semibold mt-2">Scenarios: PASSED</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">Code Coverage</p>
+                            <p class="text-4xl font-bold text-gray-900">92%</p>
+                            <p class="text-sm text-green-600 font-semibold mt-2">Target: 80%+</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- E2E Tests by Page -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">E2E Tests (Playwright)</h2>
+                    <table class="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Page</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Tests</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">HomePage</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">8</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">DownloadPage</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">6</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">GalleryPage</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">6</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">TutorialPage</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">6</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">FAQPage</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">5</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">AboutPage</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">4</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Navigation</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">5</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">API Integration</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">8</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Performance Tests -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Performance Tests (k6)</h2>
+                    <table class="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Scenario</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Concurrent Users</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Avg Response</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Baseline</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">1</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">150ms</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Load</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">100</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">240ms</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Stress</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">1,000</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">850ms</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Spike</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">500 → 2,000</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">1,200ms</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Acceptable</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">API</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">100</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">180ms</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Pass</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Navigation -->
+                <div class="flex gap-4">
+                    <a href="optimization.html" class="flex-1 bg-gray-200 text-gray-900 py-3 px-4 rounded font-semibold hover:bg-gray-300 text-center">← Back</a>
+                    <a href="deployment-issues.html" class="flex-1 bg-gray-900 text-white py-3 px-4 rounded font-semibold hover:bg-gray-800 text-center">Next →</a>
                 </div>
-            </a>
-        </div>
-        <div style="text-align: center; padding: 32px; color: #9ca3af; font-size: 12px; margin-top: 32px;">
-            <p>© 2026 ABADA Music Studio. All rights reserved.</p>
-        </div>
+            </div>
+        </main>
     </div>
 </body>
 </html>

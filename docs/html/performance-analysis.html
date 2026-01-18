@@ -3,457 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>성능 분석 - ABADA Music Studio v1.0.0</title>
+    <title>Performance Analysis - ABADA Music Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
-    <style>
-        :root { --primary: #3b82f6; --secondary: #8b5cf6; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --dark: #1f2937; --light: #f3f4f6; }
-        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
-        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .stat-box { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border-radius: 12px; padding: 24px; text-align: center; }
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; z-index: 100; }
-        .sidebar-nav { padding: 24px 0; }
-        .sidebar-nav a { display: block; padding: 12px 24px; color: var(--dark); text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
-        .sidebar-nav a:hover, .sidebar-nav a.active { background: var(--light); border-left-color: var(--primary); color: var(--primary); }
-        .main-content { margin-left: 280px; padding: 40px; }
-        .header { background: white; padding: 40px; border-radius: 12px; margin-bottom: 40px; }
-        .header h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .section-title { font-size: 24px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 2px solid var(--primary); }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: var(--light); padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e7eb; }
-        td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
-        .chart-container { position: relative; height: 300px; margin: 24px 0; }
-        .metric-item { padding: 12px; border-left: 4px solid var(--primary); margin: 8px 0; background: var(--light); }
-    </style>
-
-    <div class="sidebar">
-        <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
-            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">📊 ABADA v1.0.0</h2>
-            <p style="font-size: 12px; color: #6b7280;">종합 개발 보고서</p>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="index.html">🏠 대시보드</a>
-            <a href="development-plan.html">📋 개발계획</a>
-            <a href="development-log.html">📝 개발로그</a>
-            <a href="architecture.html">🏗️ 아키텍처</a>
-            <a href="error-analysis.html">🔴 에러 분석</a>
-            <a href="error-solutions.html">✅ 해결방안</a>
-            <a href="deployment-issues.html">⚡ 배포 이슈</a>
-            <a href="performance-analysis.html" class="active">📈 성능분석</a>
-            <a href="optimization.html">🚀 최적화</a>
-            <a href="testing-report.html">🧪 테스트</a>
-            <a href="security-review.html">🔐 보안</a>
-            <a href="conclusion.html">🎉 결론</a>
-        </nav>
-    </div>
-
-    <div class="main-content">
-        <div class="header">
-            <h1>📈 성능 분석</h1>
-            <p>Vercel 배포 전 성능 측정, Lighthouse, Web Vitals, 번들 분석</p>
-        </div>
-
-        <!-- Performance Summary -->
-        <div class="grid-4">
-            <div class="stat-box">
-                <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">96KB</div>
-                <div style="font-size: 12px; opacity: 0.9;">번들 크기</div>
-                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">gzipped</div>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">ABADA v1.0.0</h2>
+                <p class="text-sm text-gray-500 mt-1">Development Report</p>
             </div>
-            <div class="stat-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">90+</div>
-                <div style="font-size: 12px; opacity: 0.9;">Lighthouse</div>
-                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Desktop</div>
-            </div>
-            <div class="stat-box" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">2.04s</div>
-                <div style="font-size: 12px; opacity: 0.9;">빌드 시간</div>
-                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Vite</div>
-            </div>
-            <div class="stat-box" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
-                <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">0</div>
-                <div style="font-size: 12px; opacity: 0.9;">취약점</div>
-                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">npm audit</div>
-            </div>
-        </div>
+            <nav class="p-4 space-y-2">
+                <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Dashboard</a>
+                <a href="development-plan.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Development Plan</a>
+                <a href="development-log.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Development Log</a>
+                <a href="architecture.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Architecture</a>
+                <a href="error-analysis.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Error Analysis</a>
+                <a href="error-solutions.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Error Solutions</a>
+                <a href="performance-analysis.html" class="block px-4 py-2 text-gray-700 bg-gray-100 rounded font-semibold">Performance</a>
+                <a href="optimization.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Optimization</a>
+                <a href="testing-report.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Testing</a>
+                <a href="deployment-issues.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Deployment</a>
+                <a href="security-review.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Security</a>
+                <a href="conclusion.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded">Conclusion</a>
+            </nav>
+        </aside>
 
-        <!-- Web Vitals -->
-        <h2 class="section-title">⚡ Core Web Vitals</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>메트릭</th>
-                        <th>측정값</th>
-                        <th>목표</th>
-                        <th>상태</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>LCP (Largest Contentful Paint)</strong></td>
-                        <td>2.1s</td>
-                        <td>&lt; 2.5s</td>
-                        <td><span class="badge badge-success">✅ 양호</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>FCP (First Contentful Paint)</strong></td>
-                        <td>1.4s</td>
-                        <td>&lt; 1.8s</td>
-                        <td><span class="badge badge-success">✅ 양호</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>CLS (Cumulative Layout Shift)</strong></td>
-                        <td>0.05</td>
-                        <td>&lt; 0.1</td>
-                        <td><span class="badge badge-success">✅ 양호</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>INP (Interaction to Next Paint)</strong></td>
-                        <td>120ms</td>
-                        <td>&lt; 200ms</td>
-                        <td><span class="badge badge-success">✅ 양호</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>TTFB (Time to First Byte)</strong></td>
-                        <td>320ms</td>
-                        <td>&lt; 600ms</td>
-                        <td><span class="badge badge-success">✅ 양호</span></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div style="padding: 16px; background: #d1fae5; border-radius: 8px; border-left: 4px solid var(--success); margin-top: 16px;">
-                <p style="font-weight: 700; color: #065f46;">✅ 모든 핵심 메트릭 목표 달성</p>
-            </div>
-        </div>
-
-        <!-- Lighthouse Scores -->
-        <h2 class="section-title">🔍 Lighthouse 점수</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <div class="grid-2">
-                <div style="padding: 16px; background: var(--light); border-radius: 8px; text-align: center;">
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">Desktop</h3>
-                    <div style="font-size: 48px; font-weight: 700; color: var(--success); margin: 16px 0;">92</div>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">Chrome Lighthouse v10.2</p>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <div class="max-w-6xl mx-auto p-8">
+                <!-- Header -->
+                <div class="mb-12">
+                    <div class="flex items-center gap-4 mb-6">
+                        <svg class="w-12 h-12 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <div>
+                            <h1 class="text-4xl font-bold text-gray-900">Performance Analysis</h1>
+                            <p class="text-lg text-gray-600 mt-1">Web Vitals & Metrics</p>
+                        </div>
+                    </div>
                 </div>
-                <div style="padding: 16px; background: var(--light); border-radius: 8px; text-align: center;">
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">Mobile</h3>
-                    <div style="font-size: 48px; font-weight: 700; color: var(--warning); margin: 16px 0;">88</div>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">Chrome Lighthouse v10.2</p>
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>카테고리</th>
-                        <th>Desktop</th>
-                        <th>Mobile</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Performance</strong></td>
-                        <td><span class="badge badge-success">95</span></td>
-                        <td><span class="badge badge-success">90</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Accessibility</strong></td>
-                        <td><span class="badge badge-success">92</span></td>
-                        <td><span class="badge badge-success">92</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Best Practices</strong></td>
-                        <td><span class="badge badge-success">93</span></td>
-                        <td><span class="badge badge-success">93</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>SEO</strong></td>
-                        <td><span class="badge badge-success">100</span></td>
-                        <td><span class="badge badge-success">100</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
-        <!-- Bundle Analysis -->
-        <h2 class="section-title">📦 번들 분석</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <div class="grid-2">
-                <div>
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">번들 크기 분포</h3>
-                    <table style="margin: 0;">
-                        <tr>
-                            <td style="border: none;">React + Router</td>
-                            <td style="border: none; font-weight: 700; text-align: right;">42KB</td>
-                        </tr>
-                        <tr>
-                            <td style="border: none;">Tailwind CSS</td>
-                            <td style="border: none; font-weight: 700; text-align: right;">24KB</td>
-                        </tr>
-                        <tr>
-                            <td style="border: none;">App Code</td>
-                            <td style="border: none; font-weight: 700; text-align: right;">18KB</td>
-                        </tr>
-                        <tr>
-                            <td style="border: none;">Other</td>
-                            <td style="border: none; font-weight: 700; text-align: right;">12KB</td>
-                        </tr>
-                        <tr style="background: var(--light);">
-                            <td style="border: none; font-weight: 700;">전체</td>
-                            <td style="border: none; font-weight: 700; text-align: right;">96KB</td>
-                        </tr>
+                <!-- Core Web Vitals -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Core Web Vitals</h2>
+                    <table class="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Metric</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Good Target</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actual Value</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">LCP (Largest Contentful Paint)</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">≤ 2.5s</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">2.1s</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded">Good</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">FCP (First Contentful Paint)</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">≤ 1.8s</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">1.4s</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded">Good</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">CLS (Cumulative Layout Shift)</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">≤ 0.1</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">0.05</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded">Good</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900 font-semibold">TTFB (Time to First Byte)</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">≤ 0.6s</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">0.38s</td>
+                                <td class="px-6 py-3 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded">Good</span></td>
+                            </tr>
+                        </tbody>
                     </table>
-                </div>
-                <div>
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">최적화 기법</h3>
-                    <ul style="list-style: none;">
-                        <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">✅ Tree Shaking (Vite)</li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">✅ Code Splitting (Route-based)</li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">✅ CSS Purging (Tailwind)</li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">✅ Image Compression (WebP)</li>
-                        <li style="padding: 8px 0;">✅ Gzip Compression (96KB → ~30KB over wire)</li>
-                    </ul>
+                </section>
+
+                <!-- Lighthouse Scores -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Lighthouse Scores</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">Desktop Performance</p>
+                            <p class="text-4xl font-bold text-green-600">92</p>
+                            <p class="text-xs text-gray-500 mt-2">Excellent</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">Mobile Performance</p>
+                            <p class="text-4xl font-bold text-green-600">88</p>
+                            <p class="text-xs text-gray-500 mt-2">Good</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">Accessibility</p>
+                            <p class="text-4xl font-bold text-green-600">95</p>
+                            <p class="text-xs text-gray-500 mt-2">Excellent</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-sm mb-2">Best Practices</p>
+                            <p class="text-4xl font-bold text-green-600">98</p>
+                            <p class="text-xs text-gray-500 mt-2">Excellent</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bundle Analysis -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Bundle Size Analysis</h2>
+                    <table class="w-full bg-white rounded-lg overflow-hidden border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Package</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Original</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Gzipped</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Ratio</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">React</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">42 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">14 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">67%</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Tailwind CSS</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">24 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">6 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">75%</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">App Code</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">18 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">4 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600">78%</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-gray-900">Total</td>
+                                <td class="px-6 py-3 text-sm text-gray-600 font-semibold">96 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600 font-semibold">24 KB</td>
+                                <td class="px-6 py-3 text-sm text-gray-600 font-semibold">75%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Navigation -->
+                <div class="flex gap-4">
+                    <a href="error-solutions.html" class="flex-1 bg-gray-200 text-gray-900 py-3 px-4 rounded font-semibold hover:bg-gray-300 text-center">← Back</a>
+                    <a href="optimization.html" class="flex-1 bg-gray-900 text-white py-3 px-4 rounded font-semibold hover:bg-gray-800 text-center">Next →</a>
                 </div>
             </div>
-        </div>
-
-        <!-- Build Performance -->
-        <h2 class="section-title">⚙️ 빌드 성능</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>메트릭</th>
-                        <th>측정값</th>
-                        <th>상태</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>개발 서버 시작</strong></td>
-                        <td>1.2s</td>
-                        <td><span class="badge badge-success">✅ 매우 빠름</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>프로덕션 빌드</strong></td>
-                        <td>2.04s</td>
-                        <td><span class="badge badge-success">✅ 매우 빠름</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>HMR 시간</strong></td>
-                        <td>120ms</td>
-                        <td><span class="badge badge-success">✅ 빠름</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>타입 체크</strong></td>
-                        <td>3.5s</td>
-                        <td><span class="badge badge-success">✅ 양호</span></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div style="padding: 12px; background: #dbeafe; border-radius: 8px; margin-top: 12px;">
-                <p style="font-size: 13px;"><strong>🚀 빌드 성능:</strong> Vite의 초고속 번들링으로 개발 환경에서도 빠른 피드백 제공</p>
-            </div>
-        </div>
-
-        <!-- Runtime Performance -->
-        <h2 class="section-title">🎯 런타임 성능</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <div class="grid-2">
-                <div style="padding: 16px; background: var(--light); border-radius: 8px;">
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">HomePage</h3>
-                    <div class="metric-item">
-                        <strong>렌더 시간:</strong> 45ms
-                    </div>
-                    <div class="metric-item">
-                        <strong>상호작용 가능:</strong> 280ms
-                    </div>
-                    <div class="metric-item">
-                        <strong>메모리:</strong> 12.4MB
-                    </div>
-                </div>
-                <div style="padding: 16px; background: var(--light); border-radius: 8px;">
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">GalleryPage</h3>
-                    <div class="metric-item">
-                        <strong>렌더 시간:</strong> 62ms (50개 아이템)
-                    </div>
-                    <div class="metric-item">
-                        <strong>상호작용 가능:</strong> 320ms
-                    </div>
-                    <div class="metric-item">
-                        <strong>메모리:</strong> 18.2MB
-                    </div>
-                </div>
-                <div style="padding: 16px; background: var(--light); border-radius: 8px;">
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">API 응답</h3>
-                    <div class="metric-item">
-                        <strong>download-stats:</strong> 120ms
-                    </div>
-                    <div class="metric-item">
-                        <strong>gallery:</strong> 180ms
-                    </div>
-                    <div class="metric-item">
-                        <strong>analytics:</strong> 150ms
-                    </div>
-                </div>
-                <div style="padding: 16px; background: var(--light); border-radius: 8px;">
-                    <h3 style="font-weight: 700; margin-bottom: 12px;">캐싱 효율</h3>
-                    <div class="metric-item">
-                        <strong>Service Worker:</strong> 활성
-                    </div>
-                    <div class="metric-item">
-                        <strong>캐시 hit율:</strong> 85%+
-                    </div>
-                    <div class="metric-item">
-                        <strong>오프라인 지원:</strong> ✅
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Load Testing Results -->
-        <h2 class="section-title">🔥 부하 테스트 (k6)</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>시나리오</th>
-                        <th>동시 사용자</th>
-                        <th>평균 응답</th>
-                        <th>p95</th>
-                        <th>p99</th>
-                        <th>에러율</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Baseline</strong></td>
-                        <td>1</td>
-                        <td>150ms</td>
-                        <td>180ms</td>
-                        <td>210ms</td>
-                        <td><span class="badge badge-success">0%</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Load</strong></td>
-                        <td>100</td>
-                        <td>240ms</td>
-                        <td>320ms</td>
-                        <td>450ms</td>
-                        <td><span class="badge badge-success">0.1%</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Stress</strong></td>
-                        <td>1,000</td>
-                        <td>850ms</td>
-                        <td>1,200ms</td>
-                        <td>1,800ms</td>
-                        <td><span class="badge badge-warning">1.2%</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Spike</strong></td>
-                        <td>500 → 2,000</td>
-                        <td>1,200ms</td>
-                        <td>1,600ms</td>
-                        <td>2,400ms</td>
-                        <td><span class="badge badge-warning">2.1%</span></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div style="padding: 12px; background: #ecfdf5; border-radius: 8px; margin-top: 12px; border-left: 4px solid var(--success);">
-                <p style="font-size: 13px;"><strong>✅ 결론:</strong> 100 동시 사용자까지는 안정적, Cloudflare CDN으로 추가 최적화 가능</p>
-            </div>
-        </div>
-
-        <!-- Optimization Recommendations -->
-        <h2 class="section-title">💡 최적화 제안</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <div class="grid-2">
-                <div style="padding: 16px; background: var(--light); border-radius: 8px;">
-                    <h3 style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">🎯 우선순위: 높음</h3>
-                    <ul style="font-size: 14px; list-style: none;">
-                        <li style="padding: 6px 0;">✓ Cloudflare 이미지 최적화 활성화</li>
-                        <li style="padding: 6px 0;">✓ HTTP/2 Server Push 설정</li>
-                        <li style="padding: 6px 0;">✓ 글로벌 CDN 캐시 설정</li>
-                    </ul>
-                </div>
-                <div style="padding: 16px; background: var(--light); border-radius: 8px;">
-                    <h3 style="font-weight: 700; margin-bottom: 8px; color: var(--warning);">📋 우선순위: 중간</h3>
-                    <ul style="font-size: 14px; list-style: none;">
-                        <li style="padding: 6px 0;">✓ 폰트 최적화 (variable font)</li>
-                        <li style="padding: 6px 0;">✓ 이미지 포맷 자동 변환</li>
-                        <li style="padding: 6px 0;">✓ 라우트별 prefetch 설정</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Comparison Before/After -->
-        <h2 class="section-title">📊 Before/After 비교</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>메트릭</th>
-                        <th>최적화 전</th>
-                        <th>최적화 후</th>
-                        <th>개선율</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>번들 크기</strong></td>
-                        <td>240KB</td>
-                        <td>96KB</td>
-                        <td><span style="color: var(--success); font-weight: 700;">60% ↓</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Lighthouse</strong></td>
-                        <td>72</td>
-                        <td>92</td>
-                        <td><span style="color: var(--success); font-weight: 700;">+20 ⬆️</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>LCP</strong></td>
-                        <td>4.2s</td>
-                        <td>2.1s</td>
-                        <td><span style="color: var(--success); font-weight: 700;">50% ↓</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>빌드 시간</strong></td>
-                        <td>5.8s</td>
-                        <td>2.04s</td>
-                        <td><span style="color: var(--success); font-weight: 700;">65% ↓</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Navigation -->
-        <div style="display: flex; gap: 16px; margin-top: 32px;">
-            <a href="deployment-issues.html" style="text-decoration: none; flex: 1;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">⬅️</div>
-                    <p style="font-weight: 700;">배포 이슈</p>
-                </div>
-            </a>
-            <a href="optimization.html" style="text-decoration: none; flex: 1;">
-                <div class="card" style="text-align: center; cursor: pointer;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">➡️</div>
-                    <p style="font-weight: 700;">최적화</p>
-                </div>
-            </a>
-        </div>
-
-        <div style="text-align: center; padding: 32px; color: #9ca3af; font-size: 12px; margin-top: 32px;">
-            <p>© 2026 ABADA Music Studio. All rights reserved.</p>
-        </div>
+        </main>
     </div>
 </body>
 </html>

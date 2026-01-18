@@ -9,6 +9,20 @@ interface Sample {
   audioUrl: string;
   createdAt: string;
   createdBy: string;
+  duration: string;
+  waveformHeights: number[];
+}
+
+// Generate stable waveform heights for each sample
+function generateWaveformHeights(count: number, seed: number): number[] {
+  // Simple seeded pseudo-random number generator
+  const heights: number[] = [];
+  let current = seed;
+  for (let i = 0; i < count; i++) {
+    current = (current * 1103515245 + 12345) & 0x7fffffff;
+    heights.push((current % 70) + 30);
+  }
+  return heights;
 }
 
 // Mock data - in production, this would come from an API
@@ -21,6 +35,8 @@ const sampleData: Sample[] = [
     audioUrl: '/samples/sample-1.mp3',
     createdAt: '2026-01-16',
     createdBy: 'User123',
+    duration: '3:24',
+    waveformHeights: generateWaveformHeights(40, 1),
   },
   {
     id: 2,
@@ -30,6 +46,8 @@ const sampleData: Sample[] = [
     audioUrl: '/samples/sample-2.mp3',
     createdAt: '2026-01-17',
     createdBy: 'User456',
+    duration: '2:48',
+    waveformHeights: generateWaveformHeights(40, 2),
   },
   {
     id: 3,
@@ -39,6 +57,8 @@ const sampleData: Sample[] = [
     audioUrl: '/samples/sample-3.mp3',
     createdAt: '2026-01-18',
     createdBy: 'User789',
+    duration: '3:56',
+    waveformHeights: generateWaveformHeights(40, 3),
   },
   {
     id: 4,
@@ -48,6 +68,8 @@ const sampleData: Sample[] = [
     audioUrl: '/samples/sample-4.mp3',
     createdAt: '2026-01-18',
     createdBy: 'User101',
+    duration: '4:12',
+    waveformHeights: generateWaveformHeights(40, 4),
   },
 ];
 
@@ -130,14 +152,14 @@ export default function GalleryPreview() {
 
                 {/* Waveform */}
                 <div className="flex-1 h-10 flex items-center gap-0.5">
-                  {[...Array(40)].map((_, i) => (
+                  {sample.waveformHeights.map((height, i) => (
                     <div
                       key={i}
                       className={`flex-1 rounded-full transition-all duration-150 ${
                         playingId === sample.id ? 'bg-abada-primary' : 'bg-abada-primary/30'
                       }`}
                       style={{
-                        height: `${Math.random() * 70 + 30}%`,
+                        height: `${height}%`,
                         animationDelay: `${i * 50}ms`,
                       }}
                     ></div>
@@ -145,7 +167,7 @@ export default function GalleryPreview() {
                 </div>
 
                 <span className="text-sm text-gray-500 flex-shrink-0">
-                  {Math.floor(Math.random() * 2) + 2}:{String(Math.floor(Math.random() * 60)).padStart(2, '0')}
+                  {sample.duration}
                 </span>
               </div>
             </div>

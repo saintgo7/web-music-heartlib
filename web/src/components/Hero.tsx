@@ -1,5 +1,19 @@
 import { Link } from 'react-router-dom';
 
+// Generate stable waveform heights using a seeded random
+function generateWaveformHeights(count: number, seed: number): number[] {
+  const heights: number[] = [];
+  let current = seed;
+  for (let i = 0; i < count; i++) {
+    current = (current * 1103515245 + 12345) & 0x7fffffff;
+    heights.push((current % 80) + 20);
+  }
+  return heights;
+}
+
+// Pre-computed waveform heights for consistency
+const HERO_WAVEFORM_HEIGHTS = generateWaveformHeights(30, 42);
+
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
@@ -136,11 +150,11 @@ export default function Hero() {
                       </svg>
                     </button>
                     <div className="flex-1 h-12 flex items-center gap-1">
-                      {[...Array(30)].map((_, i) => (
+                      {HERO_WAVEFORM_HEIGHTS.map((height, i) => (
                         <div
                           key={i}
                           className="flex-1 bg-abada-primary/30 rounded-full"
-                          style={{ height: `${Math.random() * 80 + 20}%` }}
+                          style={{ height: `${height}%` }}
                         ></div>
                       ))}
                     </div>

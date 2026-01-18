@@ -116,7 +116,7 @@ test.describe('API Integration Tests', () => {
 
     // Verify filtering worked
     if (data.items.length > 0) {
-      data.items.forEach((item: any) => {
+      data.items.forEach((item: { tags: string[] }) => {
         expect(item.tags).toContain('pop');
       });
     }

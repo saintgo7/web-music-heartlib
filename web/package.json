@@ -1,7 +1,26 @@
 {
   "name": "abada-music-studio",
   "private": true,
-  "version": "0.3.0",
+  "version": "1.0.0",
+  "description": "ABADA Music Studio - AI Music Generation Platform powered by HeartMuLa. Create AI-generated music with just one click, completely free and runs offline.",
+  "keywords": [
+    "ai-music",
+    "music-generation",
+    "heartmula",
+    "abada",
+    "open-source",
+    "offline-capable",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "homepage": "https://music.abada.kr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saintgo7/web-music-heartlib"
+  },
+  "license": "CC-BY-NC-4.0",
+  "author": "ABADA Inc. <contact@abada.kr>",
   "type": "module",
   "scripts": {
     "dev": "vite",

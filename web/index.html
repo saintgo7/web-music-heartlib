@@ -2,8 +2,31 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Preconnect to critical origins for faster resource loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+    <!-- Preload critical fonts (only essential weights) -->
+    <link
+      rel="preload"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Primary Meta Tags -->
     <title>ABADA Music Studio - AI Music Generation Platform</title>
@@ -33,16 +56,11 @@
     <meta name="theme-color" content="#6366f1" />
     <meta name="msapplication-TileColor" content="#6366f1" />
 
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-
     <!-- Canonical URL -->
     <link rel="canonical" href="https://music.abada.kr/" />
 
-    <!-- Preconnect to external resources -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Performance hints -->
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -65,9 +83,36 @@
       }
     }
     </script>
+
+    <!-- Critical CSS inline (prevents render blocking) -->
+    <style>
+      /* Critical styles for initial render - prevents CLS */
+      *,*::before,*::after{box-sizing:border-box}
+      html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;scroll-behavior:smooth}
+      body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#fff;color:#111827}
+      #root{min-height:100vh;display:flex;flex-direction:column}
+      /* Prevent layout shift from header */
+      header{height:64px}
+      @media(min-width:768px){header{height:80px}}
+      /* Loading state */
+      .loading{min-height:100vh;display:flex;align-items:center;justify-content:center}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link sr-only focus:not-sr-only">
+      Skip to main content
+    </a>
+
+    <div id="root">
+      <!-- Initial loading state (replaced by React) -->
+      <div class="loading" aria-label="Loading ABADA Music Studio">
+        <noscript>
+          <p>JavaScript is required to run ABADA Music Studio. Please enable JavaScript in your browser.</p>
+        </noscript>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

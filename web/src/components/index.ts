@@ -5,3 +5,4 @@ export { default as Features } from './Features';
 export { default as DownloadSection } from './DownloadSection';
 export { default as GalleryPreview } from './GalleryPreview';
 export { default as SystemRequirements } from './SystemRequirements';
+export { default as LazyImage, generateSrcSet, getImageSizes } from './LazyImage';

@@ -1,7 +1,36 @@
 @import "tailwindcss";
 
-/* Google Fonts - Pretendard */
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+/*
+ * Font loading strategy:
+ * - Use font-display: swap to prevent FOIT (Flash of Invisible Text)
+ * - Preload critical font weights (400, 700)
+ * - Use system fonts as fallback for faster initial render
+ */
+
+/* Pretendard font with optimized loading */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Bold.woff2') format('woff2');
+}
 
 /* Custom Theme Configuration */
 @theme {
@@ -12,8 +41,8 @@
   --color-abada-dark: #1e1b4b;
   --color-abada-light: #e0e7ff;
 
-  /* Font family */
-  --font-sans: 'Pretendard', 'Inter', system-ui, -apple-system, sans-serif;
+  /* Font family with system font fallbacks */
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
   /* Animations */
   --animate-fade-in: fadeIn 0.5s ease-in-out;
@@ -31,9 +60,13 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Base Styles */
+/* Critical CSS - Above the fold styles */
+/* These styles are critical for initial render */
+
 html {
   scroll-behavior: smooth;
+  /* Prevent CLS from scrollbar */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -44,15 +77,48 @@ body {
   min-height: 100vh;
   color: #111827;
   background-color: white;
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
 }
 
+/* Optimize image loading */
+img {
+  /* Prevent layout shifts */
+  max-width: 100%;
+  height: auto;
+  /* Enable lazy loading hint */
+  content-visibility: auto;
+}
+
+/* Typography optimization */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   letter-spacing: -0.025em;
+  /* Prevent text rendering issues */
+  text-rendering: optimizeLegibility;
 }
 
 a {
   transition: color 0.2s;
+}
+
+/* Hardware acceleration for animations */
+.animate-spin,
+.animate-bounce,
+.animate-pulse {
+  will-change: transform;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Component Classes */
@@ -65,11 +131,20 @@ a {
   font-weight: 500;
   border-radius: 0.5rem;
   transition: all 0.2s;
+  /* Optimize touch targets */
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 .btn:focus {
   outline: none;
   box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-abada-primary);
+}
+
+/* Focus visible for keyboard navigation */
+.btn:focus-visible {
+  outline: 2px solid var(--color-abada-primary);
+  outline-offset: 2px;
 }
 
 .btn-primary {
@@ -168,4 +243,25 @@ a {
 /* Text balance utility */
 .text-balance {
   text-wrap: balance;
+}
+
+/* Skip to main content link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-abada-primary);
+  color: white;
+  padding: 8px;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Content visibility for below-the-fold content */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }

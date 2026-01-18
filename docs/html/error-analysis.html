@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>에러 분석 - ABADA Music Studio v1.0.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
+    <style>
+        :root { --primary: #3b82f6; --secondary: #8b5cf6; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --dark: #1f2937; --light: #f3f4f6; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #0c2d6b; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; z-index: 100; }
+        .sidebar-nav { padding: 24px 0; }
+        .sidebar-nav a { display: block; padding: 12px 24px; color: var(--dark); text-decoration: none; transition: all 0.3s ease; border-left: 3px solid transparent; font-size: 14px; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background: var(--light); border-left-color: var(--primary); color: var(--primary); }
+        .main-content { margin-left: 280px; padding: 40px; }
+        .header { background: white; padding: 40px; border-radius: 12px; margin-bottom: 40px; border: 1px solid rgba(0,0,0,0.05); }
+        .header h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .section-title { font-size: 24px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 2px solid var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: var(--light); padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e7eb; }
+        td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+        .code-block { background: #1f2937; color: #e5e7eb; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0; font-family: Monaco, monospace; font-size: 13px; line-height: 1.5; }
+        .error-card { border-left: 4px solid var(--danger); padding: 16px; margin: 12px 0; }
+    </style>
+
+    <div class="sidebar">
+        <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
+            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">📊 ABADA v1.0.0</h2>
+            <p style="font-size: 12px; color: #6b7280;">종합 개발 보고서</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html">🏠 대시보드</a>
+            <a href="development-plan.html">📋 개발계획</a>
+            <a href="development-log.html">📝 개발로그</a>
+            <a href="architecture.html">🏗️ 아키텍처</a>
+            <a href="error-analysis.html" class="active">🔴 에러 분석</a>
+            <a href="error-solutions.html">✅ 해결방안</a>
+            <a href="deployment-issues.html">⚡ 배포 이슈</a>
+            <a href="performance-analysis.html">📈 성능분석</a>
+            <a href="optimization.html">🚀 최적화</a>
+            <a href="testing-report.html">🧪 테스트</a>
+            <a href="security-review.html">🔐 보안</a>
+            <a href="conclusion.html">🎉 결론</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>🔴 에러 분석</h1>
+            <p>개발 과정에서 발생한 에러, 원인, 재현 조건 분석</p>
+        </div>
+
+        <!-- Error Summary -->
+        <div class="card" style="margin-bottom: 32px; border: 2px solid var(--danger);">
+            <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">📊 에러 통계</h2>
+            <div style="display: grid; gap: 16px;">
+                <table style="margin: 0;">
+                    <tr>
+                        <td style="border: none;"><strong>발생한 에러</strong></td>
+                        <td style="border: none; font-weight: 700; text-align: right;">7개</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;"><strong>해결된 에러</strong></td>
+                        <td style="border: none; font-weight: 700; text-align: right; color: var(--success);">7개 (100%)</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;"><strong>주요 카테고리</strong></td>
+                        <td style="border: none; text-align: right;">CLI · React · TypeScript · Shell</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;"><strong>평균 해결 시간</strong></td>
+                        <td style="border: none; font-weight: 700; text-align: right;">15분</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Error 1: GitHub CLI Milestone -->
+        <h2 class="section-title">1️⃣ GitHub CLI Milestone 불지원</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: CLI Compatibility</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> Phase 1 GitHub 이슈 설정 중</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+unknown command "milestone" for "gh"
+GitHub CLI version: 2.83.2
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>GitHub CLI v2.83.2는 마일스톤 생성 명령어를 미지원</li>
+                <li>gh milestone create 커맨드 없음</li>
+                <li>GitHub 웹 UI 또는 REST API 사용 필요</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+gh milestone create "Phase 1" --title="Planning" --description="..."
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>setup-github-issues 스크립트 실패</li>
+                <li>마일스톤 자동화 불가</li>
+                <li>수동 설정 필요</li>
+            </ul>
+        </div>
+
+        <!-- Error 2: Repository Issues Disabled -->
+        <h2 class="section-title">2️⃣ Repository Issues 비활성화</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: Repository Configuration</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> GitHub 이슈 생성 시도</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+the 'saintgo7/web-music-heartlib' repository has disabled issues
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>저장소 설정에서 Issues 기능이 비활성화됨</li>
+                <li>Settings → Features → Issues 체크 해제</li>
+                <li>이슈 생성/관리 불가능</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+gh issue create --title="Test" --body="Description"
+# Issues 비활성화 상태에서 실행
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>전체 이슈 워크플로우 불가</li>
+                <li>마일스톤 연결 불가</li>
+                <li>프로젝트 관리 시스템 구축 불가</li>
+            </ul>
+        </div>
+
+        <!-- Error 3: GitHub Label Create Syntax -->
+        <h2 class="section-title">3️⃣ GitHub Label Create 문법 오류</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: CLI Syntax</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> 레이블 자동 생성 스크립트</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+unknown flag: --name
+Did you mean 'gh label create LABEL_NAME'?
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>gh label create가 --name 플래그 미지원</li>
+                <li>레이블명은 위치 인자로 전달 필요</li>
+                <li>옵션은 짧은 형태 사용 (-c, -d)</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+# ❌ 잘못된 사용
+gh label create --name="bug" --color="ff0000"
+
+# ✅ 올바른 사용
+gh label create "bug" -c "ff0000" -d "Bug report"
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>레이블 일괄 생성 실패</li>
+                <li>자동화 스크립트 중단</li>
+                <li>수동 레이블 생성 필요</li>
+            </ul>
+        </div>
+
+        <!-- Error 4: React Render Purity -->
+        <h2 class="section-title">4️⃣ React 렌더링 순수성 위반</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: React Strict Mode</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> GalleryPreview, Hero 컴포넌트 렌더링</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+Warning: Function components cannot have string refs. We recommend using useCallback instead.
+Consider using React.useMemo or React.useCallback to avoid this...
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>Math.random() 호출이 렌더링 중에 발생</li>
+                <li>매 렌더링마다 다른 DOM 구조 반환</li>
+                <li>React Strict Mode에서 2번 실행 → 불일치</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+export const GalleryPreview = () => {
+  return (
+    &lt;div&gt;
+      {/* ❌ 렌더링 중 Math.random() 호출 */}
+      {Array(5).fill(0).map(() => (
+        &lt;div key={Math.random()}&gt;...&lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+};
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>Fast Refresh 불안정성</li>
+                <li>개발 중 경고 메시지</li>
+                <li>성능 최적화 기회 손실</li>
+            </ul>
+        </div>
+
+        <!-- Error 5: LazyImage setState Warning -->
+        <h2 class="section-title">5️⃣ LazyImage setState During Render</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: React Hook Violation</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> LazyImage 컴포넌트 마운트 시</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+Warning: setState during render
+This will lead to infinite loops or memory leaks.
+Move state updates to useEffect or callback functions.
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>useEffect 내에서 즉시 setState 호출</li>
+                <li>초기 렌더링 사이클과 겹침</li>
+                <li>requestAnimationFrame 없음</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+useEffect(() => {
+  // ❌ 문제: 렌더링 중 상태 업데이트
+  setIsLoaded(true);
+}, []);
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>콘솔 경고</li>
+                <li>성능 저하</li>
+                <li>메모리 누수 위험</li>
+            </ul>
+        </div>
+
+        <!-- Error 6: TypeScript Type Issues -->
+        <h2 class="section-title">6️⃣ TypeScript Type Checking 실패</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: Type Safety</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> API 테스트 파일 컴파일</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+web/tests/e2e/api.spec.ts:45:12 - error TS7006: Parameter 'response' implicitly has an 'any' type.
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>응답 객체의 타입이 명시되지 않음</li>
+                <li>TypeScript strict mode 활성화</li>
+                <li>타입 추론 실패</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+// ❌ 문제: response 타입 미명시
+const response = await fetch('/api/download-stats');
+const data = response.json();
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>빌드 실패</li>
+                <li>타입 안정성 감소</li>
+                <li>유지보수 어려움</li>
+            </ul>
+        </div>
+
+        <!-- Error 7: Service Worker Registration -->
+        <h2 class="section-title">7️⃣ Service Worker 등록 오류</h2>
+        <div class="card error-card" style="background: #fef2f2;">
+            <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--danger);">⚠️ Error Type: Runtime</h3>
+            <p style="margin-bottom: 12px;"><strong>발생 상황:</strong> 프로덕션 배포 시 SW 로드</p>
+            <p style="margin-bottom: 12px;"><strong>에러 메시지:</strong></p>
+            <div class="code-block">
+Failed to register a ServiceWorker: A bad HTTP response code (404) was received when fetching the script.
+            </div>
+            <p style="margin-bottom: 12px;"><strong>근본 원인:</strong></p>
+            <ul style="margin-bottom: 12px; margin-left: 20px;">
+                <li>SW 파일이 public 폴더에 위치</li>
+                <li>빌드 시 copy되지 않음</li>
+                <li>잘못된 경로 지정</li>
+            </ul>
+            <p style="margin-bottom: 12px;"><strong>재현 조건:</strong></p>
+            <div class="code-block">
+// ❌ 문제: public 폴더 파일 참조
+navigator.serviceWorker.register('/sw.js');
+// 404 에러
+
+// ✅ 해결: vite.config.ts에서 복사 설정
+            </div>
+            <p style="margin-bottom: 12px;"><strong>영향 범위:</strong></p>
+            <ul style="margin-bottom: 0; margin-left: 20px;">
+                <li>오프라인 기능 비활성화</li>
+                <li>캐싱 전략 미적용</li>
+                <li>성능 저하</li>
+            </ul>
+        </div>
+
+        <!-- Error Categories Chart -->
+        <h2 class="section-title">📊 에러 카테고리 분석</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>카테고리</th>
+                        <th>발생 건수</th>
+                        <th>심각도</th>
+                        <th>해결 난이도</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>React/TypeScript</strong></td>
+                        <td>3개</td>
+                        <td><span class="badge badge-warning">중간</span></td>
+                        <td>낮음</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GitHub CLI</strong></td>
+                        <td>3개</td>
+                        <td><span class="badge badge-info">낮음</span></td>
+                        <td>중간</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cloudflare/Runtime</strong></td>
+                        <td>1개</td>
+                        <td><span class="badge badge-warning">중간</span></td>
+                        <td>낮음</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Lessons Learned -->
+        <h2 class="section-title">💡 학습된 교훈</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <ul style="list-style: none;">
+                <li style="padding: 16px; background: var(--light); border-radius: 8px; margin-bottom: 12px;">
+                    <strong>1. CLI 버전 호환성 확인</strong>
+                    <p style="margin-top: 4px; color: #6b7280; font-size: 14px;">새 도구 사용 전 버전과 지원 기능 확인 필수</p>
+                </li>
+                <li style="padding: 16px; background: var(--light); border-radius: 8px; margin-bottom: 12px;">
+                    <strong>2. React Strict Mode 활용</strong>
+                    <p style="margin-top: 4px; color: #6b7280; font-size: 14px;">개발 중 잠재적 문제 조기 발견 가능</p>
+                </li>
+                <li style="padding: 16px; background: var(--light); border-radius: 8px; margin-bottom: 12px;">
+                    <strong>3. TypeScript Strict Mode</strong>
+                    <p style="margin-top: 4px; color: #6b7280; font-size: 14px;">타입 안정성으로 런타임 에러 감소</p>
+                </li>
+                <li style="padding: 16px; background: var(--light); border-radius: 8px;">
+                    <strong>4. 빌드 프로세스 검증</strong>
+                    <p style="margin-top: 4px; color: #6b7280; font-size: 14px;">정적 에셋 경로 및 복사 설정 확인</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Navigation -->
+        <div style="display: flex; gap: 16px; margin-top: 32px;">
+            <a href="development-log.html" style="text-decoration: none; flex: 1;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⬅️</div>
+                    <p style="font-weight: 700;">개발 로그</p>
+                </div>
+            </a>
+            <a href="error-solutions.html" style="text-decoration: none; flex: 1;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">➡️</div>
+                    <p style="font-weight: 700;">해결 방안</p>
+                </div>
+            </a>
+        </div>
+
+        <div style="text-align: center; padding: 32px; color: #9ca3af; font-size: 12px; margin-top: 32px;">
+            <p>© 2026 ABADA Music Studio. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

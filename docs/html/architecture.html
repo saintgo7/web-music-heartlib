@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아키텍처 - ABADA Music Studio v1.0.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
+    <style>
+        :root { --primary: #3b82f6; --dark: #1f2937; --light: #f3f4f6; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; overflow-y: auto; z-index: 100; }
+        .sidebar-nav a { display: block; padding: 12px 24px; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+        .sidebar-nav a.active { background: var(--light); border-left-color: var(--primary); color: var(--primary); }
+        .main-content { margin-left: 280px; padding: 40px; }
+        .header { background: white; padding: 40px; border-radius: 12px; margin-bottom: 40px; }
+        .header h1 { font-size: 36px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .section-title { font-size: 24px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 2px solid var(--primary); }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    </style>
+
+    <div class="sidebar">
+        <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
+            <h2 style="font-size: 18px; font-weight: 700;">📊 ABADA v1.0.0</h2>
+            <p style="font-size: 12px; color: #6b7280;">종합 개발 보고서</p>
+        </div>
+        <nav class="sidebar-nav" style="padding: 24px 0;">
+            <a href="index.html">🏠 대시보드</a>
+            <a href="development-plan.html">📋 개발계획</a>
+            <a href="development-log.html">📝 개발로그</a>
+            <a href="architecture.html" class="active">🏗️ 아키텍처</a>
+            <a href="error-analysis.html">🔴 에러 분석</a>
+            <a href="error-solutions.html">✅ 해결방안</a>
+            <a href="deployment-issues.html">⚡ 배포 이슈</a>
+            <a href="performance-analysis.html">📈 성능분석</a>
+            <a href="optimization.html">🚀 최적화</a>
+            <a href="testing-report.html">🧪 테스트</a>
+            <a href="security-review.html">🔐 보안</a>
+            <a href="conclusion.html">🎉 결론</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>🏗️ 시스템 아키텍처</h1>
+            <p>기술 스택, 컴포넌트 구조, 배포 다이어그램</p>
+        </div>
+
+        <h2 class="section-title">🛠️ 기술 스택</h2>
+        <div class="grid-2">
+            <div class="card">
+                <h3 style="font-weight: 700; margin-bottom: 12px; color: #3b82f6;">Frontend</h3>
+                <ul style="font-size: 14px; list-style: none;">
+                    <li style="padding: 6px 0;">✓ React 18</li>
+                    <li style="padding: 6px 0;">✓ TypeScript</li>
+                    <li style="padding: 6px 0;">✓ Vite 5</li>
+                    <li style="padding: 6px 0;">✓ Tailwind CSS 4</li>
+                    <li style="padding: 6px 0;">✓ React Router v6</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3 style="font-weight: 700; margin-bottom: 12px; color: #3b82f6;">Infrastructure</h3>
+                <ul style="font-size: 14px; list-style: none;">
+                    <li style="padding: 6px 0;">✓ Cloudflare Pages</li>
+                    <li style="padding: 6px 0;">✓ Cloudflare Workers</li>
+                    <li style="padding: 6px 0;">✓ Cloudflare KV</li>
+                    <li style="padding: 6px 0;">✓ GitHub Actions</li>
+                    <li style="padding: 6px 0;">✓ Global CDN</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3 style="font-weight: 700; margin-bottom: 12px; color: #3b82f6;">Testing</h3>
+                <ul style="font-size: 14px; list-style: none;">
+                    <li style="padding: 6px 0;">✓ Playwright</li>
+                    <li style="padding: 6px 0;">✓ k6</li>
+                    <li style="padding: 6px 0;">✓ Lighthouse</li>
+                    <li style="padding: 6px 0;">✓ Web Vitals</li>
+                    <li style="padding: 6px 0;">✓ ESLint</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3 style="font-weight: 700; margin-bottom: 12px; color: #3b82f6;">Installer</h3>
+                <ul style="font-size: 14px; list-style: none;">
+                    <li style="padding: 6px 0;">✓ NSIS (Windows)</li>
+                    <li style="padding: 6px 0;">✓ Bash (macOS)</li>
+                    <li style="padding: 6px 0;">✓ Shell (Linux)</li>
+                    <li style="padding: 6px 0;">✓ Python 3.10</li>
+                    <li style="padding: 6px 0;">✓ PyTorch</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title">📁 프로젝트 구조</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <div style="font-family: Monaco, monospace; font-size: 13px; line-height: 1.6; color: #e5e7eb; background: #1f2937; padding: 16px; border-radius: 8px; overflow-x: auto;">
+web-music-heartlib/
+├── web/                          # React 웹사이트
+│   ├── src/
+│   │   ├── components/           # 18개 컴포넌트
+│   │   ├── pages/                # 6개 페이지
+│   │   └── utils/                # 유틸리티 (성능, SW)
+│   ├── tests/                    # E2E + 성능 테스트
+│   └── public/                   # 정적 파일 + Service Worker
+├── installer/                    # 설치 프로그램
+│   ├── windows/                  # NSIS 스크립트
+│   ├── macos/                    # Bash 스크립트
+│   ├── linux/                    # Shell 스크립트
+│   └── app/                      # Python 음악 생성 앱
+├── functions/                    # Cloudflare Workers
+│   └── api/                      # 4개 API 엔드포인트
+├── scripts/                      # 배포 자동화 (9개)
+│   ├── DEPLOY.sh
+│   ├── MONITORING_SETUP.sh
+│   └── ROLLBACK.sh
+├── .github/workflows/            # CI/CD (6개)
+│   ├── build-installers.yml
+│   ├── deploy-website.yml
+│   ├── e2e-tests.yml
+│   └── security-scan.yml
+└── docs/                         # 문서
+    ├── html/                     # 이 보고서
+    └── [15개 마크다운]
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px;">
+            <a href="development-log.html" style="text-decoration: none; flex: 1;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⬅️</div>
+                    <p style="font-weight: 700;">개발 로그</p>
+                </div>
+            </a>
+            <a href="error-analysis.html" style="text-decoration: none; flex: 1;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">➡️</div>
+                    <p style="font-weight: 700;">에러 분석</p>
+                </div>
+            </a>
+        </div>
+
+        <div style="text-align: center; padding: 32px; color: #9ca3af; font-size: 12px; margin-top: 32px;">
+            <p>© 2026 ABADA Music Studio. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

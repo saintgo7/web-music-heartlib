@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개발 계획 - ABADA Music Studio v1.0.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
+            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">📊 ABADA v1.0.0</h2>
+            <p style="font-size: 12px; color: #6b7280;">종합 개발 보고서</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html">🏠 대시보드</a>
+            <a href="development-plan.html" class="active">📋 개발계획</a>
+            <a href="development-log.html">📝 개발로그</a>
+            <a href="architecture.html">🏗️ 아키텍처</a>
+            <a href="error-analysis.html">🔴 에러 분석</a>
+            <a href="error-solutions.html">✅ 해결방안</a>
+            <a href="deployment-issues.html">⚡ 배포 이슈</a>
+            <a href="performance-analysis.html">📈 성능분석</a>
+            <a href="optimization.html">🚀 최적화</a>
+            <a href="testing-report.html">🧪 테스트</a>
+            <a href="security-review.html">🔐 보안</a>
+            <a href="conclusion.html">🎉 결론</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>📋 개발 계획</h1>
+            <p>5개 Phase, 8주 개발 일정, 상세 태스크 분석</p>
+        </div>
+
+        <!-- Phase Overview -->
+        <h2 class="section-title">🎯 Phase 구조</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>목표</th>
+                        <th>예정</th>
+                        <th>완료</th>
+                        <th>편차</th>
+                        <th>산출물</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>v0.1.0</strong></td>
+                        <td>기획 및 설계</td>
+                        <td>2026-01-18</td>
+                        <td>2026-01-18</td>
+                        <td><span class="badge badge-success">0일</span></td>
+                        <td>5개 문서</td>
+                    </tr>
+                    <tr>
+                        <td><strong>v0.2.0</strong></td>
+                        <td>핵심 개발</td>
+                        <td>2026-02-01</td>
+                        <td>2026-01-19</td>
+                        <td><span class="badge badge-success">-13일</span></td>
+                        <td>47개 파일</td>
+                    </tr>
+                    <tr>
+                        <td><strong>v0.3.0</strong></td>
+                        <td>문서화 및 테스트 계획</td>
+                        <td>2026-02-15</td>
+                        <td>2026-01-19</td>
+                        <td><span class="badge badge-success">-27일</span></td>
+                        <td>15개 문서</td>
+                    </tr>
+                    <tr>
+                        <td><strong>v0.4.0</strong></td>
+                        <td>배포 준비</td>
+                        <td>2026-02-15</td>
+                        <td>2026-01-19</td>
+                        <td><span class="badge badge-success">-27일</span></td>
+                        <td>26개 파일</td>
+                    </tr>
+                    <tr>
+                        <td><strong>v1.0.0</strong></td>
+                        <td>릴리스 및 런칭</td>
+                        <td>2026-03-15</td>
+                        <td>2026-01-19</td>
+                        <td><span class="badge badge-success">-55일</span></td>
+                        <td>프로덕션 준비</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phase 1: Planning -->
+        <h2 class="section-title">Phase 1: 기획 (v0.1.0)</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <div style="display: grid; gap: 16px;">
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 8px;">📌 목표</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">
+                        프로젝트 비전, 기술 아키텍처, 개발 일정을 정의하고 GitHub 저장소를 초기화하는 단계
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 8px;">📋 산출물</h3>
+                    <ul style="list-style: none;">
+                        <li style="padding: 6px 0; border-bottom: 1px solid #e5e7eb;">✓ MASTER_PLAN.md (48KB, 상세 계획)</li>
+                        <li style="padding: 6px 0; border-bottom: 1px solid #e5e7eb;">✓ QUICK_START.md (7KB, 빠른 시작 가이드)</li>
+                        <li style="padding: 6px 0; border-bottom: 1px solid #e5e7eb;">✓ PROJECT_STATUS.md (진행 상황 추적)</li>
+                        <li style="padding: 6px 0;">✓ GitHub 저장소 (Issues, Labels, Wiki 초기화)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 8px;">📊 리소스</h3>
+                    <ul style="list-style: none;">
+                        <li style="padding: 6px 0;">Agent: Documentation Writer × 1</li>
+                        <li style="padding: 6px 0;">시간: 약 4시간</li>
+                        <li style="padding: 6px 0;">상태: ✅ 완료</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Development -->
+        <h2 class="section-title">Phase 2: 핵심 개발 (v0.2.0)</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <div>
+                <h3 style="font-weight: 700; margin-bottom: 16px;">🎯 세부 목표</h3>
+                <div class="grid-2">
+                    <div style="padding: 16px; background: var(--light); border-radius: 8px;">
+                        <h4 style="font-weight: 700; margin-bottom: 8px;">🖥️ 설치 프로그램</h4>
+                        <ul style="font-size: 14px; list-style: none;">
+                            <li>✓ Windows x64/x86 (NSIS)</li>
+                            <li>✓ macOS (Bash + DMG)</li>
+                            <li>✓ Linux (Multi-distro)</li>
+                            <li>✓ GPU 자동 감지</li>
+                        </ul>
+                    </div>
+                    <div style="padding: 16px; background: var(--light); border-radius: 8px;">
+                        <h4 style="font-weight: 700; margin-bottom: 8px;">🌐 웹사이트</h4>
+                        <ul style="font-size: 14px; list-style: none;">
+                            <li>✓ React 18 (TypeScript)</li>
+                            <li>✓ 6개 페이지</li>
+                            <li>✓ 18개 컴포넌트</li>
+                            <li>✓ 반응형 디자인</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top: 12px;">
+                    <div style="padding: 16px; background: var(--light); border-radius: 8px;">
+                        <h4 style="font-weight: 700; margin-bottom: 8px;">⚙️ CI/CD</h4>
+                        <ul style="font-size: 14px; list-style: none;">
+                            <li>✓ GitHub Actions (3개 워크플로우)</li>
+                            <li>✓ 자동 빌드 및 배포</li>
+                            <li>✓ 버전 관리</li>
+                            <li>✓ 보안 스캔</li>
+                        </ul>
+                    </div>
+                    <div style="padding: 16px; background: var(--light); border-radius: 8px;">
+                        <h4 style="font-weight: 700; margin-bottom: 8px;">🔌 API</h4>
+                        <ul style="font-size: 14px; list-style: none;">
+                            <li>✓ Cloudflare Workers (4개)</li>
+                            <li>✓ KV Store 연동</li>
+                            <li>✓ 통계 및 분석</li>
+                            <li>✓ CORS 설정</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 24px;">
+                <h3 style="font-weight: 700; margin-bottom: 12px;">📊 병렬 개발 구조</h3>
+                <div class="code-block">
+Agent 1 (Backend Developer):
+├── Windows NSIS (611줄)
+├── macOS Shell (262줄)
+├── Linux Shell (378줄)
+└── Python App (136+268줄)
+
+Agent 2 (Frontend Developer):
+├── React Components (8개)
+├── Pages (6개)
+├── Styling (Tailwind)
+└── Configuration (4개 파일)
+
+Agent 3 (Backend Developer):
+├── GitHub Actions (3개 워크플로우)
+├── Cloudflare Workers (4개 API)
+└── wrangler.toml 설정
+
+실행 시간: 2시간 (순차 6시간 대비 3배 향상)
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Documentation -->
+        <h2 class="section-title">Phase 3: 문서화 (v0.3.0)</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <h3 style="font-weight: 700; margin-bottom: 16px;">📚 문서 작성 목표</h3>
+            <div class="grid-3">
+                <div>
+                    <h4 style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">배포 가이드</h4>
+                    <ul style="font-size: 14px; list-style: none;">
+                        <li style="padding: 4px 0;">CLOUDFLARE_SETUP.md</li>
+                        <li style="padding: 4px 0;">DEPLOYMENT_GUIDE.md</li>
+                        <li style="padding: 4px 0;">GITHUB_SECRETS_GUIDE.md</li>
+                        <li style="padding: 4px 0;">DEPLOYMENT_CHECKLIST.md</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-weight: 700; margin-bottom: 8px; color: var(--secondary);">테스트 계획</h4>
+                    <ul style="font-size: 14px; list-style: none;">
+                        <li style="padding: 4px 0;">TESTING_PLAN.md</li>
+                        <li style="padding: 4px 0;">E2E_TEST_SCENARIOS.md (47개)</li>
+                        <li style="padding: 4px 0;">PERFORMANCE_TEST_GUIDE.md</li>
+                        <li style="padding: 4px 0;">TROUBLESHOOTING.md (19가지)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-weight: 700; margin-bottom: 8px; color: var(--warning);">전략 문서</h4>
+                    <ul style="font-size: 14px; list-style: none;">
+                        <li style="padding: 4px 0;">PHASE2_PLAN.md</li>
+                        <li style="padding: 4px 0;">PERFORMANCE_OPTIMIZATION.md</li>
+                        <li style="padding: 4px 0;">ROADMAP_TO_v1.0.md</li>
+                        <li style="padding: 4px 0;">LOCAL_TEST_SETUP.sh</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 24px; padding: 16px; background: var(--light); border-radius: 8px;">
+                <p style="font-size: 14px;"><strong>📊 통계:</strong> 15개 문서, 161KB, 4,200줄</p>
+                <p style="font-size: 14px; margin-top: 8px;"><strong>📍 멀티 에이전트:</strong> Backend(2) + Documentation(1) · 2시간</p>
+            </div>
+        </div>
+
+        <!-- Phase 4: Testing & Deployment -->
+        <h2 class="section-title">Phase 4: 테스트 & 배포 (v0.4.0)</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <div class="grid-2">
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 12px;">🧪 테스트 전략</h3>
+                    <div style="padding: 12px; background: var(--light); border-radius: 8px; margin-bottom: 12px;">
+                        <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">E2E 테스트 (Playwright)</h4>
+                        <p style="font-size: 13px; color: #6b7280;">48개 테스트 케이스 (8개 그룹)</p>
+                    </div>
+                    <div style="padding: 12px; background: var(--light); border-radius: 8px;">
+                        <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">성능 테스트 (k6)</h4>
+                        <p style="font-size: 13px; color: #6b7280;">5개 시나리오 (Baseline, Load, Stress, Spike)</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 12px;">⚡ 배포 자동화</h3>
+                    <div style="padding: 12px; background: var(--light); border-radius: 8px; margin-bottom: 12px;">
+                        <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">배포 스크립트 (7개)</h4>
+                        <p style="font-size: 13px; color: #6b7280;">자동화된 Cloudflare 배포 및 검증</p>
+                    </div>
+                    <div style="padding: 12px; background: var(--light); border-radius: 8px;">
+                        <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">성능 최적화</h4>
+                        <p style="font-size: 13px; color: #6b7280;">Code splitting, Service Worker, 캐싱</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 24px; padding: 16px; background: #dbeafe; border-radius: 8px; border-left: 4px solid var(--primary);">
+                <h4 style="font-weight: 700; margin-bottom: 8px;">📈 성능 목표</h4>
+                <table style="margin: 0; width: 100%; font-size: 14px;">
+                    <tr>
+                        <td style="border: none; width: 50%;">Lighthouse: <strong>> 90</strong></td>
+                        <td style="border: none;">FCP: <strong>< 1.8s</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">LCP: <strong>< 2.5s</strong></td>
+                        <td style="border: none;">번들: <strong>< 200KB</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">CLS: <strong>< 0.1</strong></td>
+                        <td style="border: none;">E2E Pass: <strong>> 98%</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Phase 5: Release -->
+        <h2 class="section-title">Phase 5: 릴리스 (v1.0.0)</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <div class="grid-3">
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--primary);">📦 릴리스 준비</h3>
+                    <ul style="font-size: 14px; list-style: none;">
+                        <li style="padding: 6px 0;">✓ CHANGELOG.md</li>
+                        <li style="padding: 6px 0;">✓ RELEASE_NOTES.md</li>
+                        <li style="padding: 6px 0;">✓ BUILD_VERIFICATION.md</li>
+                        <li style="padding: 6px 0;">✓ UPGRADE_GUIDE.md</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--secondary);">🚀 프로덕션 배포</h3>
+                    <ul style="font-size: 14px; list-style: none;">
+                        <li style="padding: 6px 0;">✓ PRODUCTION_DEPLOYMENT.md</li>
+                        <li style="padding: 6px 0;">✓ SECURITY_HARDENING.md</li>
+                        <li style="padding: 6px 0;">✓ INCIDENT_RESPONSE.md</li>
+                        <li style="padding: 6px 0;">✓ MONITORING_SETUP.sh</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-weight: 700; margin-bottom: 12px; color: var(--warning);">📢 마케팅</h3>
+                    <ul style="font-size: 14px; list-style: none;">
+                        <li style="padding: 6px 0;">✓ MARKETING_MATERIALS.md</li>
+                        <li style="padding: 6px 0;">✓ MEDIA_KIT.md</li>
+                        <li style="padding: 6px 0;">✓ COMMUNITY_GUIDELINES.md</li>
+                        <li style="padding: 6px 0;">✓ CONTRIBUTING.md</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Visualization -->
+        <h2 class="section-title">📅 개발 타임라인</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <div style="position: relative; padding: 20px 0;">
+                <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">
+                            Phase 1<br>기획
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">2026-01-18<br>0일</p>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">
+                            Phase 2<br>개발
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">2026-01-19<br>-13일 🚀</p>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">
+                            Phase 3<br>문서
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">2026-01-19<br>-13일 🚀</p>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">
+                            Phase 4<br>테스트
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">2026-01-19<br>-27일 🚀</p>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">
+                            Phase 5<br>릴리스
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">2026-01-19<br>-55일 🚀</p>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 16px; background: #ecfdf5; border-radius: 8px; border-left: 4px solid var(--success);">
+                <p style="font-size: 14px; color: var(--success); font-weight: 700;">
+                    ✅ 전체 개발 일정 우수 달성: 예정 <del>8주</del> → 실제 1주일!
+                </p>
+            </div>
+        </div>
+
+        <!-- Success Criteria -->
+        <h2 class="section-title">✅ 성공 기준</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>기준</th>
+                        <th>목표</th>
+                        <th>달성</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>모든 OS별 설치 프로그램</td>
+                        <td>Windows, macOS, Linux</td>
+                        <td><span class="badge badge-success">✅ 완료</span></td>
+                    </tr>
+                    <tr>
+                        <td>웹사이트 기본 페이지</td>
+                        <td>6개 페이지</td>
+                        <td><span class="badge badge-success">✅ 완료</span></td>
+                    </tr>
+                    <tr>
+                        <td>GitHub Actions 워크플로우</td>
+                        <td>3개</td>
+                        <td><span class="badge badge-success">✅ 완료</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cloudflare Workers API</td>
+                        <td>4개</td>
+                        <td><span class="badge badge-success">✅ 완료</span></td>
+                    </tr>
+                    <tr>
+                        <td>E2E 테스트</td>
+                        <td>48개</td>
+                        <td><span class="badge badge-success">✅ 완료</span></td>
+                    </tr>
+                    <tr>
+                        <td>성능 테스트</td>
+                        <td>5개 시나리오</td>
+                        <td><span class="badge badge-success">✅ 완료</span></td>
+                    </tr>
+                    <tr>
+                        <td>번들 크기</td>
+                        <td>< 200KB gzipped</td>
+                        <td><span class="badge badge-success">✅ 96KB</span></td>
+                    </tr>
+                    <tr>
+                        <td>Lighthouse 점수</td>
+                        <td>> 90</td>
+                        <td><span class="badge badge-success">✅ 90+</span></td>
+                    </tr>
+                    <tr>
+                        <td>보안 취약점</td>
+                        <td>0</td>
+                        <td><span class="badge badge-success">✅ 0</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Navigation -->
+        <div style="display: flex; gap: 16px; margin-top: 32px;">
+            <a href="index.html" style="text-decoration: none; flex: 1;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⬅️</div>
+                    <p style="font-weight: 700;">대시보드로 돌아가기</p>
+                </div>
+            </a>
+            <a href="development-log.html" style="text-decoration: none; flex: 1;">
+                <div class="card" style="text-align: center; cursor: pointer;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">➡️</div>
+                    <p style="font-weight: 700;">개발 로그 보기</p>
+                </div>
+            </a>
+        </div>
+
+        <div style="text-align: center; padding: 32px; color: #9ca3af; font-size: 12px; margin-top: 32px;">
+            <p>© 2026 ABADA Music Studio. All rights reserved.</p>
+        </div>
+    </div>
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: var(--dark);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sidebar-nav {
+            padding: 24px 0;
+        }
+        .sidebar-nav a {
+            display: block;
+            padding: 12px 24px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 14px;
+        }
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--light);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+        }
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 32px 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: var(--light);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "gallery_samples": [
+    {
+      "id": "test-001",
+      "title": "Test Song Alpha",
+      "description": "Test description for alpha song",
+      "lyrics": "[Verse]\nTest lyrics here\n\n[Chorus]\nSing along",
+      "tags": ["pop", "test", "sample"],
+      "audio_url": "https://example.com/test-alpha.mp3",
+      "thumbnail_url": "https://example.com/test-alpha.jpg",
+      "duration_seconds": 180,
+      "created_at": "2026-01-01T10:00:00Z",
+      "created_by": "Test User",
+      "featured": true
+    },
+    {
+      "id": "test-002",
+      "title": "Test Song Beta",
+      "description": "Test description for beta song",
+      "lyrics": "[Verse]\nBeta test lyrics\n\n[Bridge]\nTransition here",
+      "tags": ["rock", "test", "sample"],
+      "audio_url": "https://example.com/test-beta.mp3",
+      "thumbnail_url": "https://example.com/test-beta.jpg",
+      "duration_seconds": 240,
+      "created_at": "2026-01-02T15:00:00Z",
+      "created_by": "Test User",
+      "featured": false
+    }
+  ],
+  "download_stats": {
+    "period": "all",
+    "generated_at": "2026-01-19T00:00:00Z",
+    "downloads": {
+      "windows-x64": 150,
+      "windows-x86": 50,
+      "macos": 100,
+      "linux": 75
+    },
+    "total": 375,
+    "breakdown": {
+      "windows": 200,
+      "macos": 100,
+      "linux": 75
+    }
+  },
+  "analytics_events": [
+    {
+      "event": "page_view",
+      "page": "/",
+      "timestamp": "2026-01-19T10:00:00Z",
+      "user_agent": "Mozilla/5.0",
+      "referrer": ""
+    },
+    {
+      "event": "download_click",
+      "os": "windows-x64",
+      "page": "/download",
+      "timestamp": "2026-01-19T10:05:00Z"
+    },
+    {
+      "event": "gallery_filter",
+      "tag": "pop",
+      "page": "/gallery",
+      "timestamp": "2026-01-19T10:10:00Z"
+    }
+  ],
+  "test_users": [
+    {
+      "name": "Test User 1",
+      "email": "test1@example.com",
+      "role": "user"
+    },
+    {
+      "name": "Test Admin",
+      "email": "admin@example.com",
+      "role": "admin"
+    }
+  ],
+  "error_scenarios": [
+    {
+      "type": "404",
+      "endpoint": "/api/nonexistent",
+      "expected_message": "Not Found"
+    },
+    {
+      "type": "400",
+      "endpoint": "/api/download-stats",
+      "params": { "os": "invalid-os" },
+      "expected_message": "Invalid or missing"
+    },
+    {
+      "type": "401",
+      "endpoint": "/api/gallery",
+      "method": "POST",
+      "expected_message": "Authorization required"
+    }
+  ]
+}

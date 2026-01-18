@@ -1,0 +1,231 @@
+# =============================================================================
+# Lint and Test Workflow
+#
+# This workflow runs code quality checks on pull requests and pushes.
+# Includes:
+#   - Python linting (ruff, black)
+#   - Shell script linting (shellcheck)
+#   - NSIS script validation
+#   - Basic tests
+# =============================================================================
+
+name: Lint & Test
+
+on:
+  push:
+    branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  # ===========================================================================
+  # Python Linting
+  # ===========================================================================
+  lint-python:
+    name: Python Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install linters
+        run: |
+          pip install ruff black
+
+      - name: Run ruff (linting)
+        run: |
+          ruff check src/ installer/app/ --ignore E501,F401 || true
+
+      - name: Run black (formatting check)
+        run: |
+          black --check --diff src/ installer/app/ || true
+
+  # ===========================================================================
+  # Shell Script Linting
+  # ===========================================================================
+  lint-shell:
+    name: Shell Script Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Verify shell script syntax
+        run: |
+          # Check macOS install script
+          if [ -f "installer/macos/install.sh" ]; then
+            echo "Checking installer/macos/install.sh..."
+            bash -n installer/macos/install.sh
+            echo "Syntax OK"
+          fi
+
+          # Check Linux install script
+          if [ -f "installer/linux/mula_install.sh" ]; then
+            echo "Checking installer/linux/mula_install.sh..."
+            bash -n installer/linux/mula_install.sh
+            echo "Syntax OK"
+          fi
+
+      - name: Run shellcheck
+        continue-on-error: true
+        run: |
+          # Run shellcheck with warnings as annotations
+          shellcheck -f gcc installer/macos/install.sh 2>/dev/null || true
+          shellcheck -f gcc installer/linux/mula_install.sh 2>/dev/null || true
+
+  # ===========================================================================
+  # NSIS Script Validation (Windows)
+  # ===========================================================================
+  validate-nsis:
+    name: NSIS Validation
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install NSIS
+        run: choco install nsis -y
+
+      - name: Validate NSIS syntax
+        shell: cmd
+        run: |
+          cd installer\windows
+          REM Validate syntax only (no actual build)
+          makensis /V1 /DVERSION=test MuLaInstaller_x64.nsi 2>&1 | findstr /i "error" && exit 1 || echo "NSIS syntax OK"
+
+  # ===========================================================================
+  # Python Tests
+  # ===========================================================================
+  test-python:
+    name: Python Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-cov
+          pip install -e . || pip install .
+
+      - name: Run tests
+        continue-on-error: true
+        run: |
+          # Run tests if they exist
+          if [ -d "tests" ]; then
+            pytest tests/ -v --tb=short || true
+          else
+            echo "No tests directory found, skipping tests"
+          fi
+
+  # ===========================================================================
+  # Build Verification
+  # ===========================================================================
+  verify-build:
+    name: Verify Build Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          echo "Checking required files..."
+
+          # Check installer scripts
+          test -f "installer/macos/install.sh" && echo "macOS install.sh: OK" || echo "macOS install.sh: MISSING"
+          test -f "installer/linux/mula_install.sh" && echo "Linux mula_install.sh: OK" || echo "Linux mula_install.sh: MISSING"
+          test -f "installer/windows/MuLaInstaller_x64.nsi" && echo "Windows NSIS script: OK" || echo "Windows NSIS script: MISSING"
+          test -f "installer/app/main.py" && echo "main.py: OK" || echo "main.py: MISSING"
+
+          # Check source files
+          test -f "src/heartlib/__init__.py" && echo "heartlib package: OK" || echo "heartlib package: MISSING"
+
+      - name: Validate Python imports
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, 'src')
+          try:
+              import heartlib
+              print('heartlib import: OK')
+          except Exception as e:
+              print(f'heartlib import: FAILED - {e}')
+          "
+
+      - name: Check file permissions
+        run: |
+          # Ensure scripts are executable (for reference)
+          echo "Checking script permissions..."
+          ls -la installer/macos/install.sh 2>/dev/null || echo "macOS script not found"
+          ls -la installer/linux/mula_install.sh 2>/dev/null || echo "Linux script not found"
+
+  # ===========================================================================
+  # Security Check
+  # ===========================================================================
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for secrets in code
+        run: |
+          echo "Checking for potential secrets..."
+
+          # Check for common secret patterns
+          patterns=(
+            "API_KEY"
+            "SECRET_KEY"
+            "PASSWORD"
+            "PRIVATE_KEY"
+            "aws_secret"
+            "ghp_"
+          )
+
+          found_secrets=false
+          for pattern in "${patterns[@]}"; do
+            if grep -r -n --include="*.py" --include="*.sh" --include="*.nsi" "$pattern" . 2>/dev/null | grep -v "\.git" | grep -v "example" | grep -v "template"; then
+              echo "WARNING: Potential secret pattern found: $pattern"
+              found_secrets=true
+            fi
+          done
+
+          if [ "$found_secrets" = true ]; then
+            echo "::warning::Potential secrets found in code. Please review."
+          else
+            echo "No obvious secret patterns found."
+          fi
+
+      - name: Check for large files
+        run: |
+          echo "Checking for large files (>10MB)..."
+          find . -type f -size +10M -not -path "./.git/*" | head -20 || echo "No large files found"

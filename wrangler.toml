@@ -1,0 +1,59 @@
+# =============================================================================
+# Cloudflare Workers Configuration
+#
+# This configuration file defines the Cloudflare Workers settings
+# for the ABADA Music Studio API.
+#
+# Deploy command: wrangler deploy
+# Dev command: wrangler dev
+# =============================================================================
+
+name = "abada-music-api"
+main = "functions/api/index.js"
+compatibility_date = "2024-01-01"
+
+# Account settings (set via environment or secrets)
+# account_id = "your-account-id"
+
+# Workers routes
+# routes = [
+#   { pattern = "music.abada.kr/api/*", zone_name = "abada.kr" }
+# ]
+
+# KV Namespaces for data storage
+[[kv_namespaces]]
+binding = "STATS"
+id = "PLACEHOLDER_STATS_KV_ID"
+preview_id = "PLACEHOLDER_STATS_KV_PREVIEW_ID"
+
+[[kv_namespaces]]
+binding = "GALLERY"
+id = "PLACEHOLDER_GALLERY_KV_ID"
+preview_id = "PLACEHOLDER_GALLERY_KV_PREVIEW_ID"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+APP_NAME = "ABADA Music Studio"
+WEBSITE_URL = "https://music.abada.kr"
+GITHUB_RELEASES_URL = "https://github.com/saintgo7/web-music-heartlib/releases"
+
+# Development environment
+[env.development]
+vars = { ENVIRONMENT = "development" }
+
+# Staging environment
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
+
+# Production environment
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+# Build configuration
+[build]
+command = ""
+
+# Observability
+[observability]
+enabled = true

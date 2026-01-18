@@ -1,26 +1,55 @@
 # =============================================================================
-# Cloudflare Workers Configuration
+# ABADA Music Studio - Cloudflare Workers Configuration
 #
 # This configuration file defines the Cloudflare Workers settings
 # for the ABADA Music Studio API.
+#
+# Documentation: https://developers.cloudflare.com/workers/wrangler/configuration
 #
 # Deploy command: wrangler deploy
 # Dev command: wrangler dev
 # =============================================================================
 
+# -----------------------------------------------------------------------------
+# Basic Configuration
+# -----------------------------------------------------------------------------
+
 name = "abada-music-api"
 main = "functions/api/index.js"
 compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
 
-# Account settings (set via environment or secrets)
+# Account ID (can also be set via CLOUDFLARE_ACCOUNT_ID environment variable)
+# Uncomment and set your account ID, or use environment variable
 # account_id = "your-account-id"
 
-# Workers routes
+# -----------------------------------------------------------------------------
+# Workers Routes (Optional)
+# Configure custom domain routing for the API
+# -----------------------------------------------------------------------------
+
+# Uncomment to enable custom domain routing:
 # routes = [
 #   { pattern = "music.abada.kr/api/*", zone_name = "abada.kr" }
 # ]
 
-# KV Namespaces for data storage
+# Or use a simple pattern:
+# route = "music.abada.kr/api/*"
+# zone_name = "abada.kr"
+
+# -----------------------------------------------------------------------------
+# KV Namespaces
+# Storage for download statistics, gallery data, and analytics
+#
+# To create namespaces:
+#   wrangler kv:namespace create "STATS"
+#   wrangler kv:namespace create "STATS" --preview
+#   wrangler kv:namespace create "GALLERY"
+#   wrangler kv:namespace create "GALLERY" --preview
+#
+# Then replace the PLACEHOLDER values with actual IDs
+# -----------------------------------------------------------------------------
+
 [[kv_namespaces]]
 binding = "STATS"
 id = "PLACEHOLDER_STATS_KV_ID"
@@ -31,29 +60,197 @@ binding = "GALLERY"
 id = "PLACEHOLDER_GALLERY_KV_ID"
 preview_id = "PLACEHOLDER_GALLERY_KV_PREVIEW_ID"
 
-# Environment variables
+# -----------------------------------------------------------------------------
+# Environment Variables (Public)
+# Non-sensitive configuration values
+# -----------------------------------------------------------------------------
+
 [vars]
 ENVIRONMENT = "production"
 APP_NAME = "ABADA Music Studio"
+APP_VERSION = "1.0.0"
 WEBSITE_URL = "https://music.abada.kr"
 GITHUB_RELEASES_URL = "https://github.com/saintgo7/web-music-heartlib/releases"
+GITHUB_REPO = "saintgo7/web-music-heartlib"
+API_VERSION = "v1"
+LOG_LEVEL = "info"
+CORS_ALLOW_ALL = "true"
 
-# Development environment
+# -----------------------------------------------------------------------------
+# Development Environment
+# Local development settings
+# -----------------------------------------------------------------------------
+
 [env.development]
-vars = { ENVIRONMENT = "development" }
+name = "abada-music-api-dev"
 
-# Staging environment
+[env.development.vars]
+ENVIRONMENT = "development"
+LOG_LEVEL = "debug"
+CORS_ALLOW_ALL = "true"
+
+# Development KV namespaces (use preview IDs)
+# Uncomment and configure after creating namespaces
+# [[env.development.kv_namespaces]]
+# binding = "STATS"
+# id = "YOUR_STATS_KV_PREVIEW_ID"
+
+# [[env.development.kv_namespaces]]
+# binding = "GALLERY"
+# id = "YOUR_GALLERY_KV_PREVIEW_ID"
+
+# -----------------------------------------------------------------------------
+# Staging Environment
+# Pre-production testing
+# -----------------------------------------------------------------------------
+
 [env.staging]
-vars = { ENVIRONMENT = "staging" }
+name = "abada-music-api-staging"
 
-# Production environment
+[env.staging.vars]
+ENVIRONMENT = "staging"
+WEBSITE_URL = "https://staging.music.abada.kr"
+LOG_LEVEL = "debug"
+
+# Staging routes (optional)
+# routes = [
+#   { pattern = "staging.music.abada.kr/api/*", zone_name = "abada.kr" }
+# ]
+
+# Staging KV namespaces
+# Create separate namespaces for staging environment
+# [[env.staging.kv_namespaces]]
+# binding = "STATS"
+# id = "YOUR_STAGING_STATS_KV_ID"
+
+# [[env.staging.kv_namespaces]]
+# binding = "GALLERY"
+# id = "YOUR_STAGING_GALLERY_KV_ID"
+
+# -----------------------------------------------------------------------------
+# Production Environment
+# Live production settings
+# -----------------------------------------------------------------------------
+
 [env.production]
-vars = { ENVIRONMENT = "production" }
+name = "abada-music-api"
 
-# Build configuration
+[env.production.vars]
+ENVIRONMENT = "production"
+LOG_LEVEL = "warn"
+CORS_ALLOW_ALL = "false"
+
+# Production routes
+# routes = [
+#   { pattern = "music.abada.kr/api/*", zone_name = "abada.kr" }
+# ]
+
+# Production KV namespaces (same as default)
+# [[env.production.kv_namespaces]]
+# binding = "STATS"
+# id = "YOUR_PRODUCTION_STATS_KV_ID"
+# preview_id = "YOUR_PRODUCTION_STATS_KV_PREVIEW_ID"
+
+# [[env.production.kv_namespaces]]
+# binding = "GALLERY"
+# id = "YOUR_PRODUCTION_GALLERY_KV_ID"
+# preview_id = "YOUR_PRODUCTION_GALLERY_KV_PREVIEW_ID"
+
+# -----------------------------------------------------------------------------
+# Build Configuration
+# Custom build settings (if needed)
+# -----------------------------------------------------------------------------
+
 [build]
+# Build command (leave empty for no build step)
 command = ""
 
+# Watch directories for development mode
+# watch_dir = "functions"
+
+# -----------------------------------------------------------------------------
+# Triggers
+# Schedule and event triggers
+# -----------------------------------------------------------------------------
+
+# Cron triggers for scheduled tasks (e.g., daily cleanup)
+# [triggers]
+# crons = ["0 0 * * *"]  # Daily at midnight UTC
+
+# -----------------------------------------------------------------------------
 # Observability
+# Logging and monitoring settings
+# -----------------------------------------------------------------------------
+
 [observability]
 enabled = true
+
+# Log push (optional - requires separate setup)
+# [observability.logs]
+# enabled = true
+# invocation_logs = true
+
+# -----------------------------------------------------------------------------
+# Limits
+# Resource limits for the Worker
+# -----------------------------------------------------------------------------
+
+# limits = { cpu_ms = 50 }
+
+# -----------------------------------------------------------------------------
+# Placement
+# Geo-location hints (optional)
+# -----------------------------------------------------------------------------
+
+# [placement]
+# mode = "smart"
+
+# -----------------------------------------------------------------------------
+# Secrets (Reference Only)
+# These should be set via wrangler secret put, NOT in this file
+#
+# Required secrets:
+#   - ADMIN_API_KEY: API key for admin endpoints (gallery management)
+#
+# Set using:
+#   wrangler secret put ADMIN_API_KEY
+#   wrangler secret put ADMIN_API_KEY --env staging
+#   wrangler secret put ADMIN_API_KEY --env production
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Usage Notes
+# -----------------------------------------------------------------------------
+#
+# 1. First-time Setup:
+#    a. Create KV namespaces:
+#       wrangler kv:namespace create "STATS"
+#       wrangler kv:namespace create "STATS" --preview
+#       wrangler kv:namespace create "GALLERY"
+#       wrangler kv:namespace create "GALLERY" --preview
+#
+#    b. Update this file with the namespace IDs
+#
+#    c. Set secrets:
+#       wrangler secret put ADMIN_API_KEY
+#
+#    d. Deploy:
+#       wrangler deploy
+#
+# 2. Development:
+#    wrangler dev
+#
+# 3. Deploy to specific environment:
+#    wrangler deploy --env staging
+#    wrangler deploy --env production
+#
+# 4. View logs:
+#    wrangler tail
+#    wrangler tail --env production
+#
+# 5. Manage KV data:
+#    wrangler kv:key list --namespace-id=YOUR_KV_ID
+#    wrangler kv:key get --namespace-id=YOUR_KV_ID "key"
+#    wrangler kv:key put --namespace-id=YOUR_KV_ID "key" "value"
+#
+# =============================================================================

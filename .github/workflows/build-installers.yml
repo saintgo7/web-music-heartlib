@@ -76,12 +76,28 @@ jobs:
         shell: powershell
         run: |
           $nsiFile = "installer/windows/MuLaInstaller_x64.nsi"
-          $content = Get-Content $nsiFile -Raw
+          $lines = Get-Content $nsiFile
 
-          # Replace nsisunz extraction with SetOutPath and File commands
-          $content = $content -replace 'nsisunz::Unzip "\$INSTDIR\\python\\python-embed\.zip" "\$INSTDIR\\python"[\r\n\s]+Delete "\$INSTDIR\\python\\python-embed\.zip"', 'SetOutPath "$INSTDIR\python"`r`n    File /r "build\python\*.*"'
+          $newLines = @()
+          $i = 0
+          while ($i -lt $lines.Count) {
+            $line = $lines[$i]
 
-          $content | Set-Content $nsiFile
+            # Replace nsisunz line with File command
+            if ($line -match 'nsisunz::Unzip') {
+              $newLines += '    File /r "build\python\*.*"'
+              $i++
+              # Skip the Delete line
+              if ($i -lt $lines.Count -and $lines[$i] -match 'Delete.*python-embed\.zip') {
+                $i++
+              }
+            } else {
+              $newLines += $line
+              $i++
+            }
+          }
+
+          $newLines | Set-Content $nsiFile
           Write-Host "Modified NSIS script to use pre-extracted Python files"
 
       - name: Build NSIS Installer (x64)
@@ -153,10 +169,28 @@ jobs:
           # Force CPU mode for x86 (no CUDA)
           $content = $content -replace '\$\{If\} \$GPU_TYPE == "cuda"', '${If} 1 == 0'
 
-          # Replace nsisunz extraction with pre-extracted files
-          $content = $content -replace 'nsisunz::Unzip "\$INSTDIR\\python\\python-embed\.zip" "\$INSTDIR\\python"[\r\n\s]+Delete "\$INSTDIR\\python\\python-embed\.zip"', 'SetOutPath "$INSTDIR\python"`r`n    File /r "build\python\*.*"'
-
           $content | Set-Content "installer/windows/MuLaInstaller_x86.nsi"
+
+          # Now replace nsisunz with pre-extracted files
+          $lines = Get-Content "installer/windows/MuLaInstaller_x86.nsi"
+          $newLines = @()
+          $i = 0
+          while ($i -lt $lines.Count) {
+            $line = $lines[$i]
+
+            if ($line -match 'nsisunz::Unzip') {
+              $newLines += '    File /r "build\python\*.*"'
+              $i++
+              if ($i -lt $lines.Count -and $lines[$i] -match 'Delete.*python-embed\.zip') {
+                $i++
+              }
+            } else {
+              $newLines += $line
+              $i++
+            }
+          }
+
+          $newLines | Set-Content "installer/windows/MuLaInstaller_x86.nsi"
           Write-Host "Modified x86 NSIS script to use pre-extracted Python files"
 
       - name: Build NSIS Installer (x86)

@@ -59,40 +59,23 @@ jobs:
       - name: Install NSIS plugins
         shell: powershell
         run: |
-          # Download nsisunz plugin
+          # Download nsisunz plugin from GitHub release
           $nsisPluginDir = "C:\Program Files (x86)\NSIS\Plugins"
 
           Write-Host "Downloading nsisunz plugin..."
-          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/1/1c/Nsisunz.zip" -OutFile "$env:TEMP\nsisunz.zip"
+          # Use direct DLL download from a reliable source
+          Invoke-WebRequest -Uri "https://github.com/past-due/nsisunz/releases/download/v1.0/nsisunz.dll" -OutFile "$env:TEMP\nsisunz.dll"
 
-          Write-Host "Extracting plugin..."
-          Expand-Archive -Path "$env:TEMP\nsisunz.zip" -DestinationPath "$env:TEMP\nsisunz" -Force
-
-          Write-Host "Listing extracted files..."
-          Get-ChildItem -Path "$env:TEMP\nsisunz" -Recurse | Select-Object FullName
-
-          Write-Host "Copying plugin DLL files..."
-          # Try different possible paths
-          $possiblePaths = @(
-            "$env:TEMP\nsisunz\nsisunz\Release Unicode\nsisunz.dll",
-            "$env:TEMP\nsisunz\Release Unicode\nsisunz.dll",
-            "$env:TEMP\nsisunz\nsisunz.dll"
-          )
-
-          foreach ($path in $possiblePaths) {
-            if (Test-Path $path) {
-              Write-Host "Found plugin at: $path"
-              Copy-Item $path "$nsisPluginDir\x86-unicode\nsisunz.dll" -Force
-              Write-Host "Copied to x86-unicode"
-              break
-            }
-          }
+          Write-Host "Copying plugin to NSIS..."
+          New-Item -ItemType Directory -Force -Path "$nsisPluginDir\x86-unicode"
+          Copy-Item "$env:TEMP\nsisunz.dll" "$nsisPluginDir\x86-unicode\nsisunz.dll" -Force
 
           Write-Host "Verifying plugin installation..."
           if (Test-Path "$nsisPluginDir\x86-unicode\nsisunz.dll") {
-            Write-Host "Plugin installed successfully"
+            Write-Host "Plugin installed successfully at $nsisPluginDir\x86-unicode\nsisunz.dll"
           } else {
             Write-Error "Plugin installation failed"
+            exit 1
           }
 
       - name: Download Python Embedded (x64)
@@ -143,38 +126,23 @@ jobs:
       - name: Install NSIS plugins
         shell: powershell
         run: |
+          # Download nsisunz plugin from GitHub release
           $nsisPluginDir = "C:\Program Files (x86)\NSIS\Plugins"
 
           Write-Host "Downloading nsisunz plugin..."
-          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/1/1c/Nsisunz.zip" -OutFile "$env:TEMP\nsisunz.zip"
+          # Use direct DLL download from a reliable source
+          Invoke-WebRequest -Uri "https://github.com/past-due/nsisunz/releases/download/v1.0/nsisunz.dll" -OutFile "$env:TEMP\nsisunz.dll"
 
-          Write-Host "Extracting plugin..."
-          Expand-Archive -Path "$env:TEMP\nsisunz.zip" -DestinationPath "$env:TEMP\nsisunz" -Force
-
-          Write-Host "Listing extracted files..."
-          Get-ChildItem -Path "$env:TEMP\nsisunz" -Recurse | Select-Object FullName
-
-          Write-Host "Copying plugin DLL files..."
-          $possiblePaths = @(
-            "$env:TEMP\nsisunz\nsisunz\Release Unicode\nsisunz.dll",
-            "$env:TEMP\nsisunz\Release Unicode\nsisunz.dll",
-            "$env:TEMP\nsisunz\nsisunz.dll"
-          )
-
-          foreach ($path in $possiblePaths) {
-            if (Test-Path $path) {
-              Write-Host "Found plugin at: $path"
-              Copy-Item $path "$nsisPluginDir\x86-unicode\nsisunz.dll" -Force
-              Write-Host "Copied to x86-unicode"
-              break
-            }
-          }
+          Write-Host "Copying plugin to NSIS..."
+          New-Item -ItemType Directory -Force -Path "$nsisPluginDir\x86-unicode"
+          Copy-Item "$env:TEMP\nsisunz.dll" "$nsisPluginDir\x86-unicode\nsisunz.dll" -Force
 
           Write-Host "Verifying plugin installation..."
           if (Test-Path "$nsisPluginDir\x86-unicode\nsisunz.dll") {
-            Write-Host "Plugin installed successfully"
+            Write-Host "Plugin installed successfully at $nsisPluginDir\x86-unicode\nsisunz.dll"
           } else {
             Write-Error "Plugin installation failed"
+            exit 1
           }
 
       - name: Download Python Embedded (x86)

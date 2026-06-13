@@ -78,7 +78,7 @@ export default function DownloadSection() {
     }));
 
     // Open download URL
-    window.open(option.url, '_blank');
+    window.open(option.url, '_blank', 'noopener,noreferrer');
   };
 
   return (

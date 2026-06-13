@@ -74,7 +74,7 @@ export default function DownloadPage() {
   const handleDownload = (option: DownloadOption) => {
     // Track download (in production, this would call the API)
     console.log('Download:', option.id);
-    window.open(option.url, '_blank');
+    window.open(option.url, '_blank', 'noopener,noreferrer');
   };
 
   const selectedOption = downloadOptions.find(o => o.id === selectedOS);

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Changes History - PamOut</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span id="darkModeIcon">🌙</span>
+        <span class="toggle-label" id="darkModeLabel">Dark</span>
+    </button>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>File Changes History</h1>
+            <p class="header-subtitle">파일별 변경 내역 분석</p>
+        </div>
+        <nav class="stats-nav">
+            <a href="index.html" class="nav-link">Kanban Board</a>
+            <a href="timeline.html" class="nav-link">Timeline</a>
+            <a href="heatmap.html" class="nav-link">Heatmap</a>
+            <a href="files.html" class="nav-link active">Files</a>
+            <a href="commit-size.html" class="nav-link">Commit Size</a>
+            <a href="time-analysis.html" class="nav-link">Time Analysis</a>
+            <a href="stats.html" class="nav-link">Statistics</a>
+        </nav>
+    </header>
+
+    <main class="files-container">
+        <!-- Summary Cards -->
+        <section class="files-summary">
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Unique Files</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Total Changes</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Frontend Files</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Backend Files</div>
+            </div>
+        </section>
+
+        <!-- Charts Grid -->
+        <section class="charts-grid">
+            <!-- Top Changed Files Chart -->
+            <div class="chart-card full-width">
+                <h3 class="chart-title">Most Changed Files</h3>
+                <p class="chart-subtitle">파일별 변경 횟수 TOP 20</p>
+                <canvas id="topFilesChart"></canvas>
+            </div>
+
+            <!-- Category Distribution -->
+            <div class="chart-card">
+                <h3 class="chart-title">Files by Category</h3>
+                <p class="chart-subtitle">카테고리별 파일 분포</p>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <!-- Hot Files Table -->
+            <div class="chart-card">
+                <h3 class="chart-title">Hot Files</h3>
+                <p class="chart-subtitle">가장 자주 변경되는 파일</p>
+                <div class="hot-files-list">
+    
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed File List by Category -->
+        <section class="files-by-category">
+            <h2 class="section-title">Files by Category</h2>
+    
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Generated at 2026-02-05T22:49:23.269561 | PamOut Workstation Manager</p>
+        <p><a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a></p>
+    </footer>
+
+    <script>
+        const topFilesData = {};
+        const categoriesData = {"frontend": 0, "backend": 0, "docs": 0, "config": 0, "other": 0};
+
+        // Top Files Bar Chart
+        const topFilesLabels = Object.keys(topFilesData).map(path => {
+            const parts = path.split('/');
+            return parts[parts.length - 1];
+        });
+        const topFilesValues = Object.values(topFilesData);
+
+        new Chart(document.getElementById('topFilesChart'), {
+            type: 'bar',
+            data: {
+                labels: topFilesLabels,
+                datasets: [{
+                    label: 'Changes',
+                    data: topFilesValues,
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Category Doughnut Chart
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Frontend', 'Backend', 'Docs', 'Config', 'Other'],
+                datasets: [{
+                    data: Object.values(categoriesData),
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#6b7280'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Light';
+        }
+    </script>
+</body>
+</html>

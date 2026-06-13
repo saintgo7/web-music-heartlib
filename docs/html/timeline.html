@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Timeline - PamOut</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="scripts.js"></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span id="darkModeIcon">🌙</span>
+        <span class="toggle-label" id="darkModeLabel">Dark</span>
+    </button>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Development Timeline</h1>
+            <p class="header-subtitle">시간순 개발 히스토리</p>
+        </div>
+        <nav class="stats-nav">
+            <a href="index.html" class="nav-link">Kanban Board</a>
+            <a href="timeline.html" class="nav-link active">Timeline</a>
+            <a href="heatmap.html" class="nav-link">Heatmap</a>
+            <a href="files.html" class="nav-link">Files</a>
+            <a href="commit-size.html" class="nav-link">Commit Size</a>
+            <a href="time-analysis.html" class="nav-link">Time Analysis</a>
+            <a href="stats.html" class="nav-link">Statistics</a>
+        </nav>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Total Commits</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Files Changed</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Lines Added</span>
+                <span class="stat-value text-green">+0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Lines Deleted</span>
+                <span class="stat-value text-red">-0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="timeline-container">
+        
+    </main>
+
+    <footer class="page-footer">
+        <p>Generated at 2026-02-05T22:49:23.269561 | PamOut Workstation Manager</p>
+        <p><a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a></p>
+    </footer>
+
+    <!-- Modal -->
+    <div id="detailModal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalBody" class="markdown-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logsData = [];
+
+        // Configure marked options
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: false,
+            mangle: false
+        });
+
+        function openModal(index) {
+            const log = logsData[index];
+            if (!log) return;
+
+            const modal = document.getElementById('detailModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            // Set title
+            modalTitle.textContent = `#${log.log_number} - ${log.title}`;
+
+            // Parse and render markdown
+            const content = log.full_content || '';
+            const html = marked.parse(content);
+
+            // Safe rendering: Create temporary div, set innerHTML, then move to modal
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            modalBody.innerHTML = '';
+            modalBody.appendChild(tempDiv);
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event && event.target.classList.contains('modal-content')) {
+                return;
+            }
+            const modal = document.getElementById('detailModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Light';
+        }
+    </script>
+</body>
+</html>

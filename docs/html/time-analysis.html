@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Analysis - PamOut</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span id="darkModeIcon">🌙</span>
+        <span class="toggle-label" id="darkModeLabel">Dark</span>
+    </button>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Time Analysis</h1>
+            <p class="header-subtitle">시간대별 커밋 패턴 분석</p>
+        </div>
+        <nav class="stats-nav">
+            <a href="index.html" class="nav-link">Kanban Board</a>
+            <a href="timeline.html" class="nav-link">Timeline</a>
+            <a href="heatmap.html" class="nav-link">Heatmap</a>
+            <a href="files.html" class="nav-link">Files</a>
+            <a href="commit-size.html" class="nav-link">Commit Size</a>
+            <a href="time-analysis.html" class="nav-link active">Time Analysis</a>
+            <a href="stats.html" class="nav-link">Statistics</a>
+        </nav>
+    </header>
+
+    <main class="time-analysis-container">
+        <!-- Summary Cards -->
+        <section class="time-summary">
+            <div class="summary-card">
+                <div class="summary-value">00:00</div>
+                <div class="summary-label">Peak Hour</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">Mon</div>
+                <div class="summary-label">Most Active Day</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Weekday Commits</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Weekend Commits</div>
+            </div>
+        </section>
+
+        <!-- Insights -->
+        <section class="insights-section">
+            <div class="insight-card">
+                <h3 class="insight-title">Most Productive Time</h3>
+                <div class="insight-value">No data</div>
+                <p class="insight-description">가장 활발하게 작업하는 시간대입니다</p>
+            </div>
+            <div class="insight-card">
+                <h3 class="insight-title">Work Pattern</h3>
+                <div class="insight-value">
+                    0% Weekday
+                </div>
+                <p class="insight-description">주중/주말 작업 비율</p>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="charts-grid">
+            <div class="chart-card full-width">
+                <h3 class="chart-title">Commits by Hour</h3>
+                <p class="chart-subtitle">시간대별 커밋 분포 (24시간)</p>
+                <canvas id="hourChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">Commits by Day of Week</h3>
+                <p class="chart-subtitle">요일별 커밋 분포</p>
+                <canvas id="weekdayChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">Time Recommendations</h3>
+                <p class="chart-subtitle">작업 시간 패턴 분석</p>
+                <div class="recommendations">
+                    <div class="recommendation-item">
+                        <div class="rec-icon">⏰</div>
+                        <div class="rec-content">
+                            <strong>Peak hours:</strong> Schedule important tasks during 00:00-02:00
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="rec-icon">📅</div>
+                        <div class="rec-content">
+                            <strong>Best day:</strong> Mon shows highest activity
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="rec-icon">⚖️</div>
+                        <div class="rec-content">
+                            <strong>Work-life balance:</strong> Consider more rest on weekends
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Generated at 2026-02-05T22:49:23.269561 | PamOut Workstation Manager</p>
+        <p><a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a></p>
+    </footer>
+
+    <script>
+        const hoursData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        const weekdaysData = [0, 0, 0, 0, 0, 0, 0];
+
+        // Hour Chart
+        new Chart(document.getElementById('hourChart'), {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i.toString().padStart(2, '0')}:00`),
+                datasets: [{
+                    label: 'Commits',
+                    data: hoursData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Weekday Chart
+        new Chart(document.getElementById('weekdayChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Commits',
+                    data: weekdaysData,
+                    backgroundColor: '#10b981',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Light';
+        }
+    </script>
+</body>
+</html>

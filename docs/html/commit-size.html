@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commit Size Analysis - PamOut</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span id="darkModeIcon">🌙</span>
+        <span class="toggle-label" id="darkModeLabel">Dark</span>
+    </button>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Commit Size Analysis</h1>
+            <p class="header-subtitle">커밋 크기 패턴 분석</p>
+        </div>
+        <nav class="stats-nav">
+            <a href="index.html" class="nav-link">Kanban Board</a>
+            <a href="timeline.html" class="nav-link">Timeline</a>
+            <a href="heatmap.html" class="nav-link">Heatmap</a>
+            <a href="files.html" class="nav-link">Files</a>
+            <a href="commit-size.html" class="nav-link active">Commit Size</a>
+            <a href="stats.html" class="nav-link">Statistics</a>
+        </nav>
+    </header>
+
+    <main class="commit-size-container">
+        <!-- Summary Cards -->
+        <section class="size-summary">
+            <div class="size-card small">
+                <div class="size-card-header">
+                    <span class="size-badge">Small</span>
+                    <span class="size-range">&lt; 50 lines</span>
+                </div>
+                <div class="size-card-value">0</div>
+                <div class="size-card-percentage">0%</div>
+            </div>
+            <div class="size-card medium">
+                <div class="size-card-header">
+                    <span class="size-badge">Medium</span>
+                    <span class="size-range">50-200 lines</span>
+                </div>
+                <div class="size-card-value">0</div>
+                <div class="size-card-percentage">0%</div>
+            </div>
+            <div class="size-card large">
+                <div class="size-card-header">
+                    <span class="size-badge">Large</span>
+                    <span class="size-range">200-500 lines</span>
+                </div>
+                <div class="size-card-value">0</div>
+                <div class="size-card-percentage">0%</div>
+            </div>
+            <div class="size-card xlarge">
+                <div class="size-card-header">
+                    <span class="size-badge">X-Large</span>
+                    <span class="size-range">&gt; 500 lines</span>
+                </div>
+                <div class="size-card-value">0</div>
+                <div class="size-card-percentage">0%</div>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="charts-grid">
+            <div class="chart-card">
+                <h3 class="chart-title">Size Distribution</h3>
+                <p class="chart-subtitle">커밋 크기 분포</p>
+                <canvas id="sizeChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">Best Practices</h3>
+                <p class="chart-subtitle">권장 사항</p>
+                <div class="best-practices">
+                    <div class="practice-item">
+                        <div class="practice-icon">✓</div>
+                        <div class="practice-text">
+                            <strong>Small commits preferred:</strong> Easier to review and debug
+                        </div>
+                    </div>
+                    <div class="practice-item">
+                        <div class="practice-icon">⚠</div>
+                        <div class="practice-text">
+                            <strong>Large commits:</strong> Consider breaking into smaller pieces
+                        </div>
+                    </div>
+                    <div class="practice-item">
+                        <div class="practice-icon">!</div>
+                        <div class="practice-text">
+                            <strong>X-Large commits:</strong> Review for potential split opportunities
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Commit Lists by Size -->
+        <section class="commit-lists">
+    
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Generated at 2026-02-05T22:49:23.269561 | PamOut Workstation Manager</p>
+        <p><a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a></p>
+    </footer>
+
+    <script>
+        const sizeCounts = {"small": 0, "medium": 0, "large": 0, "xlarge": 0};
+
+        // Size Distribution Pie Chart
+        new Chart(document.getElementById('sizeChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Small (<50)', 'Medium (50-200)', 'Large (200-500)', 'X-Large (>500)'],
+                datasets: [{
+                    data: [sizeCounts.small, sizeCounts.medium, sizeCounts.large, sizeCounts.xlarge],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Light';
+        }
+    </script>
+</body>
+</html>

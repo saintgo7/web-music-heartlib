@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Heatmap - PamOut</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span id="darkModeIcon">🌙</span>
+        <span class="toggle-label" id="darkModeLabel">Dark</span>
+    </button>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Activity Heatmap</h1>
+            <p class="header-subtitle">개발 활동 히트맵</p>
+        </div>
+        <nav class="stats-nav">
+            <a href="index.html" class="nav-link">Kanban Board</a>
+            <a href="timeline.html" class="nav-link">Timeline</a>
+            <a href="heatmap.html" class="nav-link active">Heatmap</a>
+            <a href="files.html" class="nav-link">Files</a>
+            <a href="commit-size.html" class="nav-link">Commit Size</a>
+            <a href="time-analysis.html" class="nav-link">Time Analysis</a>
+            <a href="stats.html" class="nav-link">Statistics</a>
+        </nav>
+    </header>
+
+    <main class="heatmap-container">
+        <!-- Activity Summary -->
+        <section class="heatmap-summary">
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Total Commits</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Active Days</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Current Streak</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Longest Streak</div>
+            </div>
+        </section>
+
+        <!-- Heatmap -->
+        <section class="heatmap-section">
+            <div class="heatmap-header">
+                <h2>Commit Activity</h2>
+                <p class="heatmap-period">2026-02-05 - 2026-02-05</p>
+            </div>
+
+            <div class="heatmap-grid"><div class="heatmap-months"><div class="month-label">Feb</div></div><div class="heatmap-days"><div class="day-label"></div><div class="day-label">Mon</div><div class="day-label"></div><div class="day-label">Wed</div><div class="day-label"></div><div class="day-label">Fri</div><div class="day-label"></div></div><div class="heatmap-cells"><div class="heatmap-week"><div class="heatmap-cell empty"></div><div class="heatmap-cell empty"></div><div class="heatmap-cell empty"></div><div class="heatmap-cell intensity-0"
+                    data-date="2026-02-05"
+                    data-count="0"
+                    title="2026-02-05 (Thu): 0 commits">
+                </div><div class="heatmap-cell empty"></div><div class="heatmap-cell empty"></div><div class="heatmap-cell empty"></div></div></div></div>
+
+            
+    <div class="heatmap-legend">
+        <span class="legend-label">Less</span>
+        <div class="legend-squares">
+            <div class="legend-square intensity-0"></div>
+            <div class="legend-square intensity-1"></div>
+            <div class="legend-square intensity-2"></div>
+            <div class="legend-square intensity-3"></div>
+            <div class="legend-square intensity-4"></div>
+        </div>
+        <span class="legend-label">More</span>
+    </div>
+    
+        </section>
+
+        <!-- Top Days -->
+        <section class="top-days-section">
+            <h2>Most Active Days</h2>
+            <div class="top-days-list">
+    
+            </div>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Generated at 2026-02-05T22:49:23.269561 | PamOut Workstation Manager</p>
+        <p><a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a></p>
+    </footer>
+
+    <script>
+        // Tooltip for heatmap cells
+        document.querySelectorAll('.heatmap-cell:not(.empty)').forEach(cell => {
+            cell.addEventListener('mouseenter', function(e) {
+                const date = this.dataset.date;
+                const count = this.dataset.count;
+                const title = this.getAttribute('title');
+
+                // You can add custom tooltip here if needed
+                console.log(title);
+            });
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Light';
+        }
+    </script>
+</body>
+</html>

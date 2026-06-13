@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment History - PamOut</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span id="darkModeIcon">🌙</span>
+        <span class="toggle-label" id="darkModeLabel">Dark</span>
+    </button>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>🚀 Deployment History</h1>
+            <p class="header-subtitle">배포 히스토리 및 CI/CD 분석</p>
+        </div>
+        <nav class="stats-nav">
+            <a href="index.html" class="nav-link">Kanban Board</a>
+            <a href="timeline.html" class="nav-link">Timeline</a>
+            <a href="heatmap.html" class="nav-link">Heatmap</a>
+            <a href="files.html" class="nav-link">Files</a>
+            <a href="commit-size.html" class="nav-link">Commit Size</a>
+            <a href="time-analysis.html" class="nav-link">Time Analysis</a>
+            <a href="deployment.html" class="nav-link active">Deployment</a>
+            <a href="stats.html" class="nav-link">Statistics</a>
+        </nav>
+    </header>
+
+    <main class="deployment-container">
+        <!-- Summary Cards -->
+        <section class="deployment-summary">
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Total Deployments</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Per Week (Avg)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Hotfixes</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value">0</div>
+                <div class="summary-label">Infrastructure</div>
+            </div>
+        </section>
+
+        <!-- Deployment Info -->
+        <section class="deployment-info">
+            <div class="info-card">
+                <h3>🌐 Production Environment</h3>
+                <div class="info-content">
+                    <div class="info-item">
+                        <span class="info-label">URL:</span>
+                        <a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Trigger:</span>
+                        <span>Push to main branch</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Workflow:</span>
+                        <span>GitHub Actions CD</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>📦 Deployment Process</h3>
+                <div class="deployment-steps">
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <span class="step-text">Update code from main</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <span class="step-text">Rebuild containers</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-text">Health check (30s)</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">4</span>
+                        <span class="step-text">Verify status</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Grid -->
+        <section class="charts-grid">
+            <!-- Deployment Category Distribution -->
+            <div class="chart-card">
+                <h3 class="chart-title">Deployment Types</h3>
+                <p class="chart-subtitle">배포 타입별 분포</p>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <!-- Deployment Frequency -->
+            <div class="chart-card">
+                <h3 class="chart-title">Deployment Frequency</h3>
+                <p class="chart-subtitle">배포 빈도</p>
+                <div class="frequency-stats">
+                    <div class="freq-item">
+                        <div class="freq-value">0</div>
+                        <div class="freq-label">Per Day</div>
+                    </div>
+                    <div class="freq-item">
+                        <div class="freq-value">0</div>
+                        <div class="freq-label">Per Week</div>
+                    </div>
+                    <div class="freq-item">
+                        <div class="freq-value">0</div>
+                        <div class="freq-label">Per Month</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deployment Timeline -->
+        <section class="deployment-timeline">
+            <h2 class="section-title">Deployment Timeline</h2>
+            <div class="timeline-list">
+    
+            </div>
+        </section>
+
+        <!-- Deployment Best Practices -->
+        <section class="best-practices">
+            <h2 class="section-title">📋 Deployment Best Practices</h2>
+            <div class="practices-grid">
+                <div class="practice-card">
+                    <h4>✅ Automated Testing</h4>
+                    <p>모든 배포 전 자동화된 테스트 실행</p>
+                </div>
+                <div class="practice-card">
+                    <h4>🔄 Continuous Integration</h4>
+                    <p>main 브랜치에 머지 시 자동 배포</p>
+                </div>
+                <div class="practice-card">
+                    <h4>🏥 Health Checks</h4>
+                    <p>배포 후 서비스 헬스 체크 필수</p>
+                </div>
+                <div class="practice-card">
+                    <h4>📝 Release Notes</h4>
+                    <p>각 배포마다 변경사항 문서화</p>
+                </div>
+                <div class="practice-card">
+                    <h4>🔙 Rollback Plan</h4>
+                    <p>문제 발생 시 빠른 롤백 준비</p>
+                </div>
+                <div class="practice-card">
+                    <h4>🔔 Monitoring</h4>
+                    <p>배포 후 모니터링 및 알림 설정</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Generated at 2026-02-05T22:49:23.269561 | PamOut Workstation Manager</p>
+        <p><a href="https://ws.abada.co.kr" target="_blank">https://ws.abada.co.kr</a></p>
+    </footer>
+
+    <script>
+        const categories = {"hotfix": 0, "ci-config": 0, "infrastructure": 0, "release": 0};
+
+        // Category Doughnut Chart
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Hotfix', 'CI Config', 'Infrastructure', 'Release'],
+                datasets: [{
+                    data: [
+                        categories.hotfix,
+                        categories['ci-config'],
+                        categories.infrastructure,
+                        categories.release
+                    ],
+                    backgroundColor: ['#ef4444', '#06b6d4', '#8b5cf6', '#10b981'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Light';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# graphify 산출물 중 대용량/캐시 항목 제외 — GRAPH_REPORT.md와 graph.json만 추적
+graph.html
+cache/
+2026-*/

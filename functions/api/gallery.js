@@ -236,7 +236,8 @@ export async function addGalleryItem(request, env) {
     }
 
     const apiKey = authHeader.substring(7);
-    if (env.ADMIN_API_KEY && apiKey !== env.ADMIN_API_KEY) {
+    // Fail closed: if no admin key is configured, the endpoint must not be usable.
+    if (!env.ADMIN_API_KEY || apiKey !== env.ADMIN_API_KEY) {
       return new Response(
         JSON.stringify({
           error: 'Invalid API key',

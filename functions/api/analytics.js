@@ -177,6 +177,34 @@ export async function recordAnalytics(request, env) {
  */
 export async function getAnalytics(request, env) {
   try {
+    // Admin-only endpoint: require a valid API key (fail closed).
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({
+          error: 'Authorization required',
+          success: false,
+        }),
+        {
+          status: 401,
+          headers: corsHeaders,
+        }
+      );
+    }
+    const apiKey = authHeader.substring(7);
+    if (!env.ADMIN_API_KEY || apiKey !== env.ADMIN_API_KEY) {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid API key',
+          success: false,
+        }),
+        {
+          status: 403,
+          headers: corsHeaders,
+        }
+      );
+    }
+
     const url = new URL(request.url);
     const period = url.searchParams.get('period') || 'today';
     const typeFilter = url.searchParams.get('type') || 'all';
